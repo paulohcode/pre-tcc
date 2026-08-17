@@ -32,6 +32,11 @@ const panelSection = document.getElementById("admin-panel");
 const rankingEmpty = document.getElementById("ranking-empty");
 const rankingTable = document.getElementById("ranking-table");
 const rankingBody = document.getElementById("ranking-body");
+const editPanel = document.getElementById("admin-edit");
+const editStudentsList = document.getElementById("edit-students-list");
+const editSaveBtn = document.getElementById("edit-save");
+
+let projectsById = new Map();
 
 function requireFirebase() {
   if (!isFirebaseConfigured()) {
@@ -86,9 +91,84 @@ async function loadAdminData() {
   renderRanking(projects, votes);
 }
 
+function editStudentRow(name = "", canRemove = false) {
+  const wrap = document.createElement("div");
+  wrap.className = "flex gap-2";
+  wrap.innerHTML = `
+    <input
+      type="text"
+      required
+      maxlength="80"
+      class="edit-student-name flex-1 bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50"
+      placeholder="Nome e sobrenome"
+    />
+    ${
+      canRemove
+        ? '<button type="button" class="remove-student px-3 border border-gold/20 text-stone-400 hover:text-red-200 hover:border-red-400/30">✕</button>'
+        : ""
+    }
+  `;
+  wrap.querySelector("input.edit-student-name").value = name;
+  const remove = wrap.querySelector(".remove-student");
+  if (remove) {
+    remove.addEventListener("click", () => {
+      wrap.remove();
+      refreshEditRemoveButtons();
+    });
+  }
+  return wrap;
+}
+
+function refreshEditRemoveButtons() {
+  const rows = [...editStudentsList.children];
+  rows.forEach((row, index) => {
+    const btn = row.querySelector(".remove-student");
+    if (rows.length === 1 && btn) btn.remove();
+    if (rows.length > 1 && !btn) {
+      const extra = document.createElement("button");
+      extra.type = "button";
+      extra.className =
+        "remove-student px-3 border border-gold/20 text-stone-400 hover:text-red-200 hover:border-red-400/30";
+      extra.textContent = "✕";
+      extra.addEventListener("click", () => {
+        row.remove();
+        refreshEditRemoveButtons();
+      });
+      row.appendChild(extra);
+    }
+  });
+}
+
+function closeEdit() {
+  editPanel.classList.add("hidden");
+  document.getElementById("edit-project-id").value = "";
+  document.getElementById("form-edit-projeto").reset();
+  editStudentsList.innerHTML = "";
+}
+
+function openEdit(project) {
+  document.getElementById("edit-project-id").value = project.id;
+  document.getElementById("edit-title").value = project.title || "";
+  document.getElementById("edit-description").value = project.description || "";
+  document.getElementById("edit-view-public").href = `projeto.html?id=${encodeURIComponent(project.id)}`;
+
+  const students = (project.students || []).map((name) => String(name).trim()).filter(Boolean);
+  editStudentsList.innerHTML = "";
+  (students.length ? students : [""]).forEach((name, index, list) => {
+    editStudentsList.appendChild(editStudentRow(name, list.length > 1));
+  });
+  refreshEditRemoveButtons();
+
+  editPanel.classList.remove("hidden");
+  editPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 function renderProjects(projects) {
   const root = document.getElementById("admin-projects");
+  projectsById = new Map(projects.map((project) => [project.id, project]));
+
   if (!projects.length) {
+    closeEdit();
     root.innerHTML = '<p class="text-stone-400 text-sm">Nenhum projeto cadastrado.</p>';
     return;
   }
@@ -101,16 +181,29 @@ function renderProjects(projects) {
   root.innerHTML = sorted
     .map(
       (project) => `
-        <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 px-4 py-3">
-          <div>
-            <p class="font-medium">${project.order ? `${escapeHtml(formatOrder(project.order))} · ` : ""}${escapeHtml(project.title)}</p>
-            <p class="text-sm text-stone-500">${escapeHtml((project.students || []).join(" · "))}</p>
+        <div class="border border-gold/15 px-4 py-4">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div class="min-w-0 flex-1">
+              <p class="font-medium">${project.order ? `${escapeHtml(formatOrder(project.order))} · ` : ""}${escapeHtml(project.title)}</p>
+              <p class="text-sm text-stone-400 mt-1">${escapeHtml((project.students || []).join(" · ") || "Sem integrantes")}</p>
+              <p class="text-sm text-stone-500 mt-2 line-clamp-3">${escapeHtml(project.description || "")}</p>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+              <button type="button" data-edit="${escapeHtml(project.id)}" class="text-xs uppercase tracking-[0.16em] text-gold hover:text-gold-light">Editar</button>
+              <button type="button" data-delete="${escapeHtml(project.id)}" class="text-xs uppercase tracking-[0.16em] text-stone-500 hover:text-red-200">Excluir</button>
+            </div>
           </div>
-          <button data-delete="${escapeHtml(project.id)}" class="text-xs text-stone-500 hover:text-red-200">Excluir</button>
         </div>
       `
     )
     .join("");
+
+  root.querySelectorAll("[data-edit]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const project = projectsById.get(btn.dataset.edit);
+      if (project) openEdit(project);
+    });
+  });
 
   root.querySelectorAll("[data-delete]").forEach((btn) => {
     btn.addEventListener("click", async () => {
@@ -118,6 +211,9 @@ function renderProjects(projects) {
       const firebase = getFirebase();
       try {
         await deleteDoc(doc(firebase.db, "projects", btn.dataset.delete));
+        if (document.getElementById("edit-project-id").value === btn.dataset.delete) {
+          closeEdit();
+        }
         showToast("Projeto excluído.");
         await loadAdminData();
       } catch (error) {
@@ -226,6 +322,58 @@ document.getElementById("btn-votacao").addEventListener("click", async () => {
   await ensureEventConfig(firebase.db, { votingOpen: !config.votingOpen });
   showToast(config.votingOpen ? "Votação fechada." : "Votação aberta.");
   await loadAdminData();
+});
+
+document.getElementById("edit-add-student").addEventListener("click", () => {
+  editStudentsList.appendChild(editStudentRow("", true));
+  refreshEditRemoveButtons();
+});
+
+document.getElementById("edit-cancel").addEventListener("click", () => {
+  closeEdit();
+});
+
+document.getElementById("form-edit-projeto").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const firebase = getFirebase();
+  if (!firebase) return;
+
+  const id = document.getElementById("edit-project-id").value;
+  const title = document.getElementById("edit-title").value.trim();
+  const description = document.getElementById("edit-description").value.trim();
+  const students = [...editStudentsList.querySelectorAll("input.edit-student-name")]
+    .map((input) => input.value.trim())
+    .filter(Boolean);
+
+  if (!id) {
+    showToast("Selecione um projeto para editar.", "error");
+    return;
+  }
+  if (!title || !description) {
+    showToast("Preencha o nome e a descrição do projeto.", "error");
+    return;
+  }
+  if (!students.length) {
+    showToast("Informe pelo menos um integrante.", "error");
+    return;
+  }
+
+  editSaveBtn.disabled = true;
+  try {
+    await updateDoc(doc(firebase.db, "projects", id), {
+      title,
+      description,
+      students,
+    });
+    showToast("Projeto atualizado.");
+    closeEdit();
+    await loadAdminData();
+  } catch (error) {
+    console.error(error);
+    showToast("Não foi possível salvar. Confira o login e as regras do Firestore.", "error");
+  } finally {
+    editSaveBtn.disabled = false;
+  }
 });
 
 const firebase = requireFirebase();

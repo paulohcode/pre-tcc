@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,11 +17,12 @@
         theme: {
           extend: {
             colors: {
-              navy: { 950: "#070b14", 900: "#0c1222", 800: "#141c2e", 700: "#1c2740", 600: "#243250" },
-              gold: { DEFAULT: "#d4a853", dim: "#b8923f", light: "#f3e2b6" },
+              navy: { 950: "#05060c", 900: "#0a0d16", 800: "#12182a", 700: "#1c2740", 600: "#243250" },
+              gold: { DEFAULT: "#c9a56a", dim: "#a98442", light: "#f0e1b8" },
             },
             fontFamily: {
-              serif: ["Fraunces", "Georgia", "serif"],
+              display: ["Cinzel", "Georgia", "serif"],
+              serif: ["Cormorant Garamond", "Georgia", "serif"],
               sans: ["Outfit", "system-ui", "sans-serif"],
             },
           },
@@ -35,38 +36,40 @@
       Configure o Firebase em <code class="text-gold">js/firebase-config.js</code> para ativar cadastros e votos. Veja o README.
     </div>
 
-    <header class="relative z-20 border-b border-white/10 bg-navy-950/70 backdrop-blur">
-      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+    <header class="site-header relative z-20">
+      <div class="header-rail"></div>
+      <div class="max-w-6xl mx-auto px-4 py-5 flex items-center justify-between gap-4">
         <a href="index.html" class="flex items-center gap-3">
-          <span class="w-9 h-9 rounded-lg border border-gold/40 bg-navy-800 grid place-items-center text-gold font-serif">B</span>
+          <span class="logo-mark text-lg">B</span>
           <div>
-            <p class="text-[11px] uppercase tracking-[0.2em] text-gold/80">Evento acadêmico</p>
-            <p data-event-title class="font-serif text-lg leading-tight">Banca de TCC</p>
+            <p class="font-display text-[10px] uppercase tracking-[0.32em] text-gold/80">Evento acadêmico</p>
+            <p data-event-title class="font-serif text-xl leading-tight">Banca de TCC</p>
           </div>
         </a>
-        <nav class="flex flex-wrap items-center justify-end gap-1 text-sm">
-          <a class="px-3 py-2 rounded-lg text-stone-300 hover:text-white hover:bg-white/5" href="projetos.html">Projetos</a>
-          <a class="px-3 py-2 rounded-lg text-stone-300 hover:text-white hover:bg-white/5" href="cadastrar.html">Cadastrar</a>
-          <a class="px-3 py-2 rounded-lg border border-gold/30 bg-gold/10 text-gold" href="admin.html">Professor</a>
+        <nav class="flex flex-wrap items-center justify-end gap-1">
+          <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="projetos.html">Projetos</a>
+          <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="cadastrar.html">Cadastrar</a>
+          <a class="nav-link is-active px-3 py-2 text-gold" href="admin.html">Professor</a>
         </nav>
       </div>
     </header>
 
     <main class="max-w-6xl mx-auto px-4 py-12">
       <section id="admin-login" class="max-w-md mx-auto">
-        <p class="text-xs uppercase tracking-[0.25em] text-gold mb-2">Acesso restrito</p>
-        <h1 class="font-serif text-4xl mb-3">Área do professor</h1>
+        <p class="font-display text-[11px] uppercase tracking-[0.35em] text-gold mb-2">Acesso restrito</p>
+        <h1 class="font-serif text-5xl mb-3">Área do professor</h1>
+        <p class="ornament ornament-sm mb-6">✦</p>
         <p class="text-stone-400 mb-8">Use o e-mail e a senha criados no Firebase Authentication.</p>
-        <form id="form-login" class="rounded-2xl border border-white/10 bg-navy-800/50 p-6 space-y-4">
+        <form id="form-login" class="panel p-8 space-y-4">
           <div>
             <label for="admin-email" class="block text-sm mb-2 text-stone-300">E-mail</label>
-            <input id="admin-email" type="email" required class="w-full rounded-xl bg-navy-950 border border-white/10 px-4 py-3 outline-none focus:border-gold/50" />
+            <input id="admin-email" type="email" required class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" />
           </div>
           <div>
             <label for="admin-password" class="block text-sm mb-2 text-stone-300">Senha</label>
-            <input id="admin-password" type="password" required class="w-full rounded-xl bg-navy-950 border border-white/10 px-4 py-3 outline-none focus:border-gold/50" />
+            <input id="admin-password" type="password" required class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" />
           </div>
-          <button type="submit" class="w-full py-3 rounded-xl bg-gold text-navy-950 font-semibold hover:bg-gold-light">
+          <button type="submit" class="btn-gold w-full py-3">
             Entrar
           </button>
         </form>
@@ -75,45 +78,45 @@
       <section id="admin-panel" class="hidden space-y-8">
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p class="text-xs uppercase tracking-[0.25em] text-gold mb-2">Painel</p>
-            <h1 class="font-serif text-4xl">Controle da banca</h1>
+            <p class="font-display text-[11px] uppercase tracking-[0.35em] text-gold mb-2">Painel</p>
+            <h1 class="font-serif text-5xl">Controle da banca</h1>
           </div>
           <button id="admin-logout" class="text-sm text-stone-400 hover:text-white">Sair</button>
         </div>
 
         <div class="grid md:grid-cols-3 gap-5">
-          <div class="rounded-2xl border border-white/10 bg-navy-800/50 p-6">
-            <h2 class="font-serif text-xl mb-2">Nome do evento</h2>
+          <div class="panel p-6">
+            <h2 class="font-serif text-2xl mb-2">Nome do evento</h2>
             <form id="form-event-title" class="space-y-3">
-              <input id="event-title-input" maxlength="80" class="w-full rounded-xl bg-navy-950 border border-white/10 px-4 py-3 outline-none focus:border-gold/50" />
+              <input id="event-title-input" maxlength="80" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" />
               <button type="submit" class="text-sm text-gold hover:text-gold-light">Salvar nome</button>
             </form>
           </div>
-          <div class="rounded-2xl border border-white/10 bg-navy-800/50 p-6">
-            <h2 class="font-serif text-xl mb-2">Ordem das apresentações</h2>
+          <div class="panel p-6">
+            <h2 class="font-serif text-2xl mb-2">Ordem das apresentações</h2>
             <p id="draw-status" class="text-sm text-stone-400 mb-4">Ainda não sorteada.</p>
-            <button id="btn-sortear" class="w-full py-3 rounded-xl bg-gold text-navy-950 font-semibold hover:bg-gold-light">
+            <button id="btn-sortear" class="btn-gold w-full py-3">
               Sortear ordem
             </button>
           </div>
-          <div class="rounded-2xl border border-white/10 bg-navy-800/50 p-6">
-            <h2 class="font-serif text-xl mb-2">Votação</h2>
+          <div class="panel p-6">
+            <h2 class="font-serif text-2xl mb-2">Votação</h2>
             <p id="voting-status" class="text-sm text-stone-400 mb-4">Fechada</p>
-            <button id="btn-votacao" class="w-full py-3 rounded-xl border border-white/15 hover:border-gold/40">
+            <button id="btn-votacao" class="btn-ghost w-full py-3">
               Abrir votação
             </button>
           </div>
         </div>
 
-        <div class="rounded-2xl border border-white/10 bg-navy-800/50 p-6 md:p-8">
+        <div class="panel p-6 md:p-8">
           <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
-            <h2 class="font-serif text-2xl">Ranking</h2>
-            <p class="text-sm text-stone-500">Visível apenas para o professor</p>
+            <h2 class="font-serif text-3xl">Ranking</h2>
+            <p class="font-display text-[10px] tracking-[0.2em] uppercase text-stone-500">Visível apenas para o professor</p>
           </div>
           <div id="ranking-empty" class="text-stone-400 text-sm">Ainda não há votos.</div>
           <div id="ranking-table" class="hidden overflow-x-auto">
             <table class="w-full text-left text-sm">
-              <thead class="text-stone-400 border-b border-white/10">
+              <thead class="text-stone-400 border-b border-gold/15">
                 <tr>
                   <th class="py-3 pr-3 font-medium">#</th>
                   <th class="py-3 pr-3 font-medium">Projeto</th>
@@ -127,15 +130,65 @@
           </div>
         </div>
 
-        <div class="rounded-2xl border border-white/10 bg-navy-800/50 p-6 md:p-8">
-          <h2 class="font-serif text-2xl mb-4">Projetos cadastrados</h2>
+        <div id="admin-edit" class="hidden panel p-6 md:p-8">
+          <div class="flex flex-wrap items-start justify-between gap-3 mb-6">
+            <div>
+              <p class="font-display text-[11px] uppercase tracking-[0.35em] text-gold mb-2">Edição</p>
+              <h2 class="font-serif text-3xl">Editar projeto</h2>
+            </div>
+            <button type="button" id="edit-cancel" class="text-sm text-stone-400 hover:text-white">Fechar</button>
+          </div>
+          <form id="form-edit-projeto" class="space-y-6">
+            <input type="hidden" id="edit-project-id" />
+            <div>
+              <label for="edit-title" class="block text-sm mb-2 text-stone-300">Nome do projeto</label>
+              <input
+                id="edit-title"
+                required
+                maxlength="120"
+                class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50"
+              />
+            </div>
+            <div>
+              <label class="block text-sm mb-2 text-stone-300">Integrantes</label>
+              <div id="edit-students-list" class="space-y-3"></div>
+              <button type="button" id="edit-add-student" class="mt-3 text-sm text-gold hover:text-gold-light">
+                + Adicionar integrante
+              </button>
+            </div>
+            <div>
+              <label for="edit-description" class="block text-sm mb-2 text-stone-300">Descrição</label>
+              <textarea
+                id="edit-description"
+                required
+                rows="5"
+                maxlength="2000"
+                class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50 resize-y"
+              ></textarea>
+            </div>
+            <div class="flex flex-wrap items-center gap-4">
+              <button type="submit" id="edit-save" class="btn-gold px-5 py-3 disabled:opacity-50">
+                Salvar alterações
+              </button>
+              <a id="edit-view-public" href="projetos.html" class="text-sm text-stone-400 hover:text-white">
+                Ver página pública
+              </a>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel p-6 md:p-8">
+          <h2 class="font-serif text-3xl mb-2">Projetos cadastrados</h2>
+          <p class="text-sm text-stone-500 mb-4">Abra um projeto para ver os detalhes e ajustar a lista de integrantes.</p>
           <div id="admin-projects" class="space-y-3"></div>
         </div>
       </section>
     </main>
 
-    <footer class="border-t border-white/10 py-8 text-center text-sm text-stone-500">
-      Banca de TCC · simulação de evento acadêmico
+    <footer class="site-footer py-12 text-center">
+      <p class="font-display text-[10px] tracking-[0.4em] text-gold/80 uppercase">Banca de TCC</p>
+      <p class="ornament justify-center my-4">✦</p>
+      <p class="text-sm text-stone-500">Simulação de apresentações comerciais · evento acadêmico</p>
     </footer>
 
     <div id="toast-root" class="fixed bottom-4 right-4 z-50 space-y-2"></div>

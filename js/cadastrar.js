@@ -18,12 +18,12 @@ function studentRow(canRemove) {
       type="text"
       required
       maxlength="80"
-      class="student-name flex-1 rounded-xl bg-navy-950 border border-white/10 px-4 py-3 outline-none focus:border-gold/50"
+      class="student-name flex-1 bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50"
       placeholder="Nome e sobrenome"
     />
     ${
       canRemove
-        ? '<button type="button" class="remove-student px-3 rounded-xl border border-white/10 text-stone-400 hover:text-red-200 hover:border-red-400/30">✕</button>'
+        ? '<button type="button" class="remove-student px-3 border border-gold/20 text-stone-400 hover:text-red-200 hover:border-red-400/30">✕</button>'
         : ""
     }
   `;
@@ -46,7 +46,7 @@ function refreshRemoveButtons() {
       const extra = document.createElement("button");
       extra.type = "button";
       extra.className =
-        "remove-student px-3 rounded-xl border border-white/10 text-stone-400 hover:text-red-200 hover:border-red-400/30";
+        "remove-student px-3 border border-gold/20 text-stone-400 hover:text-red-200 hover:border-red-400/30";
       extra.textContent = "✕";
       extra.addEventListener("click", () => {
         row.remove();

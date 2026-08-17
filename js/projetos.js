@@ -23,10 +23,16 @@ function sortProjects(projects) {
 
 function card(project) {
   const orderLabel = formatOrder(project.order);
+  const index = project.order
+    ? String(project.order).padStart(2, "0")
+    : "—";
   return `
-    <a href="projeto.html?id=${encodeURIComponent(project.id)}" class="card-glow block rounded-2xl border border-white/10 bg-navy-800/60 p-6 transition">
-      ${orderLabel ? `<p class="text-xs uppercase tracking-[0.2em] text-gold mb-2">${escapeHtml(orderLabel)}</p>` : ""}
-      <h2 class="font-serif text-2xl mb-2">${escapeHtml(project.title)}</h2>
+    <a href="projeto.html?id=${encodeURIComponent(project.id)}" class="card-glow panel program-card">
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <p class="program-index">${escapeHtml(index)}</p>
+        ${orderLabel ? `<p class="font-display text-[10px] uppercase tracking-[0.22em] text-gold/80 pt-1">${escapeHtml(orderLabel)}</p>` : ""}
+      </div>
+      <h2 class="font-serif text-3xl mb-2">${escapeHtml(project.title)}</h2>
       <p class="text-sm text-stone-400 mb-4">${escapeHtml((project.students || []).join(" · "))}</p>
       <p class="text-stone-500 text-sm line-clamp-3">${escapeHtml(project.description)}</p>
     </a>

@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,11 +17,12 @@
         theme: {
           extend: {
             colors: {
-              navy: { 950: "#070b14", 900: "#0c1222", 800: "#141c2e", 700: "#1c2740", 600: "#243250" },
-              gold: { DEFAULT: "#d4a853", dim: "#b8923f", light: "#f3e2b6" },
+              navy: { 950: "#05060c", 900: "#0a0d16", 800: "#12182a", 700: "#1c2740", 600: "#243250" },
+              gold: { DEFAULT: "#c9a56a", dim: "#a98442", light: "#f0e1b8" },
             },
             fontFamily: {
-              serif: ["Fraunces", "Georgia", "serif"],
+              display: ["Cinzel", "Georgia", "serif"],
+              serif: ["Cormorant Garamond", "Georgia", "serif"],
               sans: ["Outfit", "system-ui", "sans-serif"],
             },
           },
@@ -35,57 +36,60 @@
       Configure o Firebase em <code class="text-gold">js/firebase-config.js</code> para ativar cadastros e votos. Veja o README.
     </div>
 
-    <header class="relative z-20 border-b border-white/10 bg-navy-950/70 backdrop-blur">
-      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+    <header class="site-header relative z-20">
+      <div class="header-rail"></div>
+      <div class="max-w-6xl mx-auto px-4 py-5 flex items-center justify-between gap-4">
         <a href="index.html" class="flex items-center gap-3">
-          <span class="w-9 h-9 rounded-lg border border-gold/40 bg-navy-800 grid place-items-center text-gold font-serif">B</span>
+          <span class="logo-mark text-lg">B</span>
           <div>
-            <p class="text-[11px] uppercase tracking-[0.2em] text-gold/80">Evento acadêmico</p>
-            <p data-event-title class="font-serif text-lg leading-tight">Banca de TCC</p>
+            <p class="font-display text-[10px] uppercase tracking-[0.32em] text-gold/80">Evento acadêmico</p>
+            <p data-event-title class="font-serif text-xl leading-tight">Banca de TCC</p>
           </div>
         </a>
-        <nav class="flex flex-wrap items-center justify-end gap-1 text-sm">
-          <a class="px-3 py-2 rounded-lg text-stone-300 hover:text-white hover:bg-white/5" href="projetos.html">Projetos</a>
-          <a class="px-3 py-2 rounded-lg text-stone-300 hover:text-white hover:bg-white/5" href="cadastrar.html">Cadastrar</a>
-          <a class="px-3 py-2 rounded-lg border border-gold/30 text-gold hover:bg-gold/10" href="admin.html">Professor</a>
+        <nav class="flex flex-wrap items-center justify-end gap-1">
+          <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="projetos.html">Projetos</a>
+          <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="cadastrar.html">Cadastrar</a>
+          <a class="nav-link px-3 py-2 text-gold" href="admin.html">Professor</a>
         </nav>
       </div>
     </header>
 
     <main class="max-w-6xl mx-auto px-4 py-12">
-      <a href="projetos.html" class="text-sm text-stone-400 hover:text-gold">← Voltar aos projetos</a>
+      <a href="projetos.html" class="font-display text-[11px] tracking-[0.2em] uppercase text-stone-400 hover:text-gold">← Programação</a>
 
       <div id="projeto-loading" class="mt-8 text-stone-400">Carregando…</div>
       <div id="projeto-missing" class="hidden mt-8 text-stone-400">Projeto não encontrado.</div>
 
       <div id="projeto-content" class="hidden mt-8 grid lg:grid-cols-[1.2fr_0.8fr] gap-8">
-        <article class="rounded-2xl border border-white/10 bg-navy-800/50 p-6 md:p-8">
-          <p id="projeto-order" class="text-xs uppercase tracking-[0.25em] text-gold mb-3"></p>
-          <h1 id="projeto-title" class="font-serif text-4xl mb-4"></h1>
+        <article class="panel p-8 md:p-10">
+          <p id="projeto-order" class="font-display text-[11px] uppercase tracking-[0.28em] text-gold mb-4"></p>
+          <h1 id="projeto-title" class="font-serif text-4xl md:text-5xl mb-4"></h1>
+          <p class="ornament ornament-sm mb-6">✦</p>
           <p id="projeto-students" class="text-stone-300 mb-6"></p>
           <p id="projeto-description" class="text-stone-400 leading-relaxed whitespace-pre-wrap"></p>
         </article>
 
-        <aside class="rounded-2xl border border-white/10 bg-navy-800/50 p-6 md:p-8 h-fit">
-          <h2 class="font-serif text-2xl mb-1">Avaliar apresentação</h2>
-          <p class="text-sm text-stone-400 mb-6">Notas de 0 a 10 em cada critério. A média entra no ranking da banca.</p>
+        <aside class="panel p-8 md:p-10 h-fit">
+          <p class="font-display text-[10px] tracking-[0.28em] text-gold uppercase">Avaliação da banca</p>
+          <h2 class="font-serif text-3xl mt-2 mb-1">Avaliar apresentação</h2>
+          <p class="text-sm text-stone-400 mb-6">Notas de 0 a 10 em cada critério. A média entra no ranking da noite.</p>
 
-          <div id="vote-closed" class="hidden text-stone-400 text-sm border border-white/10 rounded-xl p-4">
+          <div id="vote-closed" class="hidden text-stone-400 text-sm border border-gold/15 p-4">
             A votação ainda não foi aberta pelo professor.
           </div>
 
-          <div id="vote-own" class="hidden text-stone-400 text-sm border border-white/10 rounded-xl p-4">
+          <div id="vote-own" class="hidden text-stone-400 text-sm border border-gold/15 p-4">
             Você faz parte desta equipe e não pode votar no próprio projeto.
           </div>
 
-          <div id="vote-done" class="hidden text-emerald-200/90 text-sm border border-emerald-500/20 bg-emerald-500/10 rounded-xl p-4">
+          <div id="vote-done" class="hidden text-emerald-200/90 text-sm border border-emerald-500/20 bg-emerald-500/10 p-4">
             Seu voto neste projeto já foi registrado.
           </div>
 
           <form id="form-ident" class="hidden space-y-4">
             <div>
               <label for="voter-name" class="block text-sm mb-2 text-stone-300">Seu nome (como no cadastro)</label>
-              <select id="voter-name" class="w-full rounded-xl bg-navy-950 border border-white/10 px-4 py-3 outline-none focus:border-gold/50">
+              <select id="voter-name" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50">
                 <option value="">Selecione</option>
               </select>
             </div>
@@ -96,12 +100,12 @@
                 inputmode="numeric"
                 maxlength="4"
                 pattern="[0-9]{4}"
-                class="w-full rounded-xl bg-navy-950 border border-white/10 px-4 py-3 outline-none focus:border-gold/50 tracking-[0.4em]"
+                class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50 tracking-[0.4em]"
                 placeholder="••••"
               />
               <p class="text-xs text-stone-500 mt-2">Na primeira votação este PIN é criado. Nas próximas, use o mesmo.</p>
             </div>
-            <button type="submit" class="w-full py-3 rounded-xl bg-gold text-navy-950 font-semibold hover:bg-gold-light">
+            <button type="submit" class="btn-gold w-full py-3">
               Continuar para votar
             </button>
           </form>
@@ -110,7 +114,7 @@
             <p id="voter-session" class="text-sm text-stone-400"></p>
             <div id="criteria-fields" class="space-y-5"></div>
             <p class="text-sm text-stone-300">Média deste voto: <span id="vote-preview" class="text-gold font-semibold">5.0</span></p>
-            <button type="submit" id="submit-voto" class="w-full py-3 rounded-xl bg-gold text-navy-950 font-semibold hover:bg-gold-light disabled:opacity-50">
+            <button type="submit" id="submit-voto" class="btn-gold w-full py-3 disabled:opacity-50">
               Enviar voto
             </button>
             <button type="button" id="logout-aluno" class="w-full text-sm text-stone-500 hover:text-stone-300">
@@ -121,8 +125,10 @@
       </div>
     </main>
 
-    <footer class="border-t border-white/10 py-8 text-center text-sm text-stone-500">
-      Banca de TCC · simulação de evento acadêmico
+    <footer class="site-footer py-12 text-center">
+      <p class="font-display text-[10px] tracking-[0.4em] text-gold/80 uppercase">Banca de TCC</p>
+      <p class="ornament justify-center my-4">✦</p>
+      <p class="text-sm text-stone-500">Simulação de apresentações comerciais · evento acadêmico</p>
     </footer>
 
     <div id="toast-root" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
