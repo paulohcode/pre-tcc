@@ -41,12 +41,56 @@ export const EVENT_TYPES = {
   },
 };
 
+export const VOTE_ACCESS = {
+  alunos: {
+    id: "alunos",
+    label: "Somente inscritos (nome da lista + PIN)",
+  },
+  qrcode: {
+    id: "qrcode",
+    label: "Público com QR Code no celular",
+  },
+  ambos: {
+    id: "ambos",
+    label: "Inscritos e público (QR Code + lista)",
+  },
+};
+
 export function eventType(type) {
   return EVENT_TYPES[type] || EVENT_TYPES.projetos;
 }
 
+export function voteAccess(mode) {
+  return VOTE_ACCESS[mode] || VOTE_ACCESS.alunos;
+}
+
+export function allowsQrVote(event) {
+  return event?.voteAccess === "qrcode" || event?.voteAccess === "ambos";
+}
+
+export function allowsOpenName(event) {
+  return event?.voteAccess === "qrcode" || event?.voteAccess === "ambos";
+}
+
+export function eventPublicUrl(eventId) {
+  const page = window.location.pathname.replace(/[^/]+$/, "evento.html");
+  return `${window.location.origin}${page}?id=${encodeURIComponent(eventId)}`;
+}
+
+export async function renderQrCode(canvas, url) {
+  if (!canvas || !url) return;
+  const mod = await import("https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm");
+  const QRCode = mod.default || mod;
+  await QRCode.toCanvas(canvas, url, {
+    width: 220,
+    margin: 1,
+    color: { dark: "#003da5", light: "#ffffff" },
+  });
+}
+
 export function normalizeEvent(id, data = {}) {
   const type = EVENT_TYPES[data.type] ? data.type : "projetos";
+  const access = VOTE_ACCESS[data.voteAccess] ? data.voteAccess : "alunos";
   return {
     id,
     title: data.title || "Evento",
@@ -56,6 +100,8 @@ export function normalizeEvent(id, data = {}) {
     time: data.time || "",
     location: data.location || "",
     className: data.className || "",
+    audience: data.audience || "",
+    voteAccess: access,
     votingOpen: Boolean(data.votingOpen),
     orderDrawnAt: data.orderDrawnAt || null,
     createdAt: data.createdAt || null,
@@ -85,6 +131,7 @@ export function eventFacts(event) {
     event.time ? { label: "Horário", value: formatEventTime(event.time) } : null,
     event.location ? { label: "Local", value: event.location } : null,
     event.className ? { label: "Turma", value: event.className } : null,
+    event.audience ? { label: "Público-alvo", value: event.audience } : null,
   ].filter(Boolean);
 }
 
@@ -213,11 +260,12 @@ export async function loadEventProjects(eventId) {
 export function eventCardHtml(event) {
   const type = eventType(event.type);
   const date = formatEventDate(event.date) || "Data a definir";
+  const audience = event.audience ? ` · ${event.audience}` : "";
   return `
     <a href="evento.html?id=${encodeURIComponent(event.id)}" class="card-link panel p-6">
       <span class="badge mb-4">${escapeHtml(type.label)}</span>
       <h2 class="text-2xl font-semibold mb-2">${escapeHtml(event.title)}</h2>
-      <p class="text-sm text-slate-500 mb-3">${escapeHtml(date)}${event.location ? ` · ${escapeHtml(event.location)}` : ""}</p>
+      <p class="text-sm text-slate-500 mb-3">${escapeHtml(date)}${event.location ? ` · ${escapeHtml(event.location)}` : ""}${escapeHtml(audience)}</p>
       <p class="text-slate-600 text-sm line-clamp-3">${escapeHtml(event.description || "Abra para ver os detalhes e as inscrições.")}</p>
     </a>
   `;

@@ -31,7 +31,7 @@ export async function identifyStudent(name, pin) {
 
   const trimmed = name.trim();
   const voterId = slugifyName(trimmed);
-  if (!voterId) throw new Error("Selecione o seu nome.");
+  if (!voterId) throw new Error("Informe o seu nome.");
   if (!/^\d{4}$/.test(pin)) throw new Error("O PIN deve ter 4 dígitos numéricos.");
 
   const pinHash = await hashPin(trimmed, pin);

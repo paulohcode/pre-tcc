@@ -27,6 +27,9 @@ import {
   CRITERIA,
   average,
   round1,
+  allowsQrVote,
+  eventPublicUrl,
+  renderQrCode,
 } from "./app.js";
 
 const loginSection = document.getElementById("admin-login");
@@ -59,6 +62,8 @@ function eventFormPayload(prefix) {
   const timeId = prefix === "new" ? "new-time" : "event-time-input";
   const locationId = prefix === "new" ? "new-location" : "event-location-input";
   const descriptionId = prefix === "new" ? "new-description" : "event-description-input";
+  const audienceId = prefix === "new" ? "new-audience" : "event-audience-input";
+  const voteAccessId = prefix === "new" ? "new-vote-access" : "event-vote-access-input";
   return {
     title: document.getElementById(titleId).value.trim(),
     type: document.getElementById(typeId).value,
@@ -67,6 +72,8 @@ function eventFormPayload(prefix) {
     time: document.getElementById(timeId).value,
     location: document.getElementById(locationId).value.trim(),
     description: document.getElementById(descriptionId).value.trim(),
+    audience: document.getElementById(audienceId).value.trim(),
+    voteAccess: document.getElementById(voteAccessId).value,
   };
 }
 
@@ -79,6 +86,8 @@ function fillEventForm(event) {
   document.getElementById("event-time-input").value = event.time || "";
   document.getElementById("event-location-input").value = event.location || "";
   document.getElementById("event-description-input").value = event.description || "";
+  document.getElementById("event-audience-input").value = event.audience || "";
+  document.getElementById("event-vote-access-input").value = event.voteAccess || "alunos";
   document.getElementById("event-view-public").href = `evento.html?id=${encodeURIComponent(event.id)}`;
   document.getElementById("draw-status").textContent = event.orderDrawnAt
     ? "Ordem já sorteada. Você pode sortear de novo se precisar."
@@ -87,6 +96,24 @@ function fillEventForm(event) {
   document.getElementById("btn-votacao").textContent = event.votingOpen ? "Fechar votação" : "Abrir votação";
   const type = eventType(event.type);
   document.getElementById("admin-entries-title").textContent = type.plural.charAt(0).toUpperCase() + type.plural.slice(1);
+  renderEventQr(event);
+}
+
+async function renderEventQr(event) {
+  const panel = document.getElementById("qr-panel");
+  if (!allowsQrVote(event)) {
+    panel.classList.add("hidden");
+    return;
+  }
+  const url = eventPublicUrl(event.id);
+  panel.classList.remove("hidden");
+  document.getElementById("admin-qr-url").textContent = url;
+  document.getElementById("admin-qr-open").href = url;
+  try {
+    await renderQrCode(document.getElementById("admin-qr-canvas"), url);
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 function showList() {
@@ -439,6 +466,17 @@ document.getElementById("edit-add-student").addEventListener("click", () => {
   refreshEditRemoveButtons();
 });
 document.getElementById("edit-cancel").addEventListener("click", () => closeEdit());
+
+document.getElementById("btn-copy-qr").addEventListener("click", async () => {
+  const url = document.getElementById("admin-qr-url").textContent;
+  if (!url) return;
+  try {
+    await navigator.clipboard.writeText(url);
+    showToast("Link copiado.");
+  } catch {
+    showToast("Copie o link manualmente.", "error");
+  }
+});
 
 document.getElementById("form-edit-projeto").addEventListener("submit", async (event) => {
   event.preventDefault();

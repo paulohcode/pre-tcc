@@ -7,6 +7,9 @@ import {
   sortProjects,
   projectCardHtml,
   escapeHtml,
+  allowsQrVote,
+  eventPublicUrl,
+  renderQrCode,
 } from "./app.js";
 
 const params = new URLSearchParams(window.location.search);
@@ -58,6 +61,16 @@ async function loadPage() {
       `
     )
     .join("");
+
+  const qrPanel = document.getElementById("qr-panel");
+  if (allowsQrVote(event)) {
+    const url = eventPublicUrl(event.id);
+    qrPanel.classList.remove("hidden");
+    document.getElementById("evento-qr-url").textContent = url;
+    renderQrCode(document.getElementById("evento-qr-canvas"), url).catch((error) => console.error(error));
+  } else {
+    qrPanel.classList.add("hidden");
+  }
 
   content.classList.remove("hidden");
 

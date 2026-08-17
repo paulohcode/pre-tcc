@@ -92,6 +92,19 @@
                 <input id="new-class" maxlength="80" class="field" />
               </div>
               <div>
+                <label for="new-audience" class="block text-sm mb-2">Público-alvo</label>
+                <input id="new-audience" maxlength="80" class="field" placeholder="Ex.: Alunos da turma, visitantes, comunidade" />
+              </div>
+              <div class="md:col-span-2">
+                <label for="new-vote-access" class="block text-sm mb-2">Como o público vota</label>
+                <select id="new-vote-access" class="field">
+                  <option value="alunos">Somente inscritos (nome da lista + PIN)</option>
+                  <option value="qrcode">Público com QR Code no celular</option>
+                  <option value="ambos">Inscritos e público (QR Code + lista)</option>
+                </select>
+                <p class="text-xs text-slate-500 mt-2">O QR Code leva o celular direto à página do evento para votar. O site precisa estar publicado na internet.</p>
+              </div>
+              <div>
                 <label for="new-date" class="block text-sm mb-2">Data</label>
                 <input id="new-date" type="date" class="field" />
               </div>
@@ -140,6 +153,18 @@
                 <input id="event-class-input" maxlength="80" class="field" />
               </div>
               <div>
+                <label for="event-audience-input" class="block text-sm mb-2">Público-alvo</label>
+                <input id="event-audience-input" maxlength="80" class="field" placeholder="Ex.: Alunos da turma, visitantes, comunidade" />
+              </div>
+              <div class="md:col-span-2">
+                <label for="event-vote-access-input" class="block text-sm mb-2">Como o público vota</label>
+                <select id="event-vote-access-input" class="field">
+                  <option value="alunos">Somente inscritos (nome da lista + PIN)</option>
+                  <option value="qrcode">Público com QR Code no celular</option>
+                  <option value="ambos">Inscritos e público (QR Code + lista)</option>
+                </select>
+              </div>
+              <div>
                 <label for="event-date-input" class="block text-sm mb-2">Data</label>
                 <input id="event-date-input" type="date" class="field" />
               </div>
@@ -161,6 +186,23 @@
               <a id="event-view-public" href="index.html" class="btn-outline px-5 py-3">Ver página pública</a>
             </div>
           </form>
+
+          <div id="qr-panel" class="hidden panel p-8">
+            <h2 class="text-2xl font-semibold mb-2">QR Code da votação</h2>
+            <p class="text-sm text-slate-500 mb-6">Imprima ou projete este código. Quem apontar a câmera do celular abre a página do evento e vota.</p>
+            <div class="flex flex-wrap items-start gap-8">
+              <canvas id="admin-qr-canvas" class="bg-white border border-slate-200 p-2"></canvas>
+              <div class="min-w-0 flex-1">
+                <p class="text-xs uppercase tracking-wide text-slate-400 mb-2">Link</p>
+                <p id="admin-qr-url" class="text-sm break-all text-slate-600 mb-4"></p>
+                <div class="flex flex-wrap gap-3">
+                  <button type="button" id="btn-copy-qr" class="btn-outline px-4 py-2">Copiar link</button>
+                  <a id="admin-qr-open" href="#" target="_blank" rel="noopener" class="btn-primary px-4 py-2">Abrir no navegador</a>
+                </div>
+                <p class="text-xs text-slate-500 mt-4">Se o endereço começar com <code>file://</code>, publique o site (GitHub Pages, Firebase Hosting etc.) para o celular conseguir abrir.</p>
+              </div>
+            </div>
+          </div>
 
           <div class="grid md:grid-cols-2 gap-5">
             <div class="panel p-6">

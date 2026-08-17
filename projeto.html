@@ -75,11 +75,17 @@
           </div>
 
           <form id="form-ident" class="hidden space-y-4">
-            <div>
+            <p id="vote-access-hint" class="text-sm text-slate-500"></p>
+            <div id="voter-select-wrap">
               <label for="voter-name" class="block text-sm mb-2">Seu nome (como no cadastro)</label>
               <select id="voter-name" class="field">
                 <option value="">Selecione</option>
               </select>
+            </div>
+            <div id="voter-input-wrap" class="hidden">
+              <label for="voter-name-input" class="block text-sm mb-2">Seu nome</label>
+              <input id="voter-name-input" list="voter-name-list" maxlength="80" class="field" placeholder="Nome e sobrenome" />
+              <datalist id="voter-name-list"></datalist>
             </div>
             <div>
               <label for="voter-pin" class="block text-sm mb-2">PIN de 4 dígitos</label>
@@ -94,7 +100,7 @@
             <div id="criteria-fields" class="space-y-5"></div>
             <p class="text-sm">Média deste voto: <span id="vote-preview" class="text-blue font-semibold">5.0</span></p>
             <button type="submit" id="submit-voto" class="btn-primary w-full py-3 disabled:opacity-50">Enviar voto</button>
-            <button type="button" id="logout-aluno" class="w-full text-sm text-slate-500 hover:text-slate-800">Trocar de aluno</button>
+            <button type="button" id="logout-aluno" class="w-full text-sm text-slate-500 hover:text-slate-800">Trocar de votante</button>
           </form>
         </aside>
       </div>

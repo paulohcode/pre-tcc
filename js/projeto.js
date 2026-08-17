@@ -20,6 +20,7 @@ import {
   round1,
   showToast,
   slugifyName,
+  allowsOpenName,
 } from "./app.js";
 import {
   getStudentSession,
@@ -43,6 +44,8 @@ const voteDone = document.getElementById("vote-done");
 const criteriaFields = document.getElementById("criteria-fields");
 const votePreview = document.getElementById("vote-preview");
 const voterSelect = document.getElementById("voter-name");
+const voterInput = document.getElementById("voter-name-input");
+const registeredNames = [];
 
 let currentProject = null;
 let currentEvent = null;
@@ -94,6 +97,27 @@ function currentScores() {
 
 function updatePreview() {
   votePreview.textContent = round1(average(Object.values(currentScores()))).toFixed(1);
+}
+
+function currentVoterName() {
+  if (allowsOpenName(currentEvent)) {
+    return (voterInput?.value || "").trim();
+  }
+  return (voterSelect?.value || "").trim();
+}
+
+function setupVoteAccessUi() {
+  const open = allowsOpenName(currentEvent);
+  document.getElementById("voter-select-wrap").classList.toggle("hidden", open);
+  document.getElementById("voter-input-wrap").classList.toggle("hidden", !open);
+  const hint = document.getElementById("vote-access-hint");
+  if (currentEvent?.voteAccess === "qrcode") {
+    hint.textContent = "Votação aberta ao público. Informe seu nome e um PIN de 4 dígitos.";
+  } else if (currentEvent?.voteAccess === "ambos") {
+    hint.textContent = "Alunos da lista ou visitantes podem votar. Use o mesmo nome e PIN se já tiver votado em outro trabalho.";
+  } else {
+    hint.textContent = "Somente integrantes cadastrados neste evento podem votar.";
+  }
 }
 
 async function showVoteUi() {
@@ -159,24 +183,38 @@ async function loadPage() {
   const eventProjects = currentProject.eventId
     ? (await getDocs(query(collection(firebase.db, "projects"), where("eventId", "==", currentProject.eventId)))).docs.map((d) => d.data())
     : [];
-  uniqueStudentNames(eventProjects).forEach((name) => {
+  const names = uniqueStudentNames(eventProjects);
+  registeredNames.splice(0, registeredNames.length, ...names);
+  names.forEach((name) => {
     const option = document.createElement("option");
     option.value = name;
     option.textContent = name;
     voterSelect.appendChild(option);
+    const hint = document.createElement("option");
+    hint.value = name;
+    document.getElementById("voter-name-list").appendChild(hint);
   });
 
+  setupVoteAccessUi();
   await showVoteUi();
 }
 
 formIdent.addEventListener("submit", async (event) => {
   event.preventDefault();
+  const name = currentVoterName();
+  if (!allowsOpenName(currentEvent)) {
+    const allowed = registeredNames.some((item) => slugifyName(item) === slugifyName(name));
+    if (!allowed) {
+      showToast("Selecione um nome da lista de inscritos deste evento.", "error");
+      return;
+    }
+  }
   try {
-    await identifyStudent(voterSelect.value, document.getElementById("voter-pin").value.trim());
+    await identifyStudent(name, document.getElementById("voter-pin").value.trim());
     await showVoteUi();
   } catch (error) {
     console.error(error);
-    showToast(error.message || "Não foi possível identificar o aluno.", "error");
+    showToast(error.message || "Não foi possível identificar o votante.", "error");
   }
 });
 

@@ -61,7 +61,18 @@
           <a id="evento-register" href="cadastrar.html" class="btn-primary px-5 py-3">Cadastrar</a>
         </div>
 
-        <div id="evento-facts" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12"></div>
+        <div id="evento-facts" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10"></div>
+
+        <div id="qr-panel" class="hidden panel p-8 mb-12">
+          <div class="flex flex-wrap items-start gap-8">
+            <canvas id="evento-qr-canvas" class="bg-white border border-slate-200 p-2"></canvas>
+            <div>
+              <h2 class="text-2xl font-semibold mb-2">Vote pelo celular</h2>
+              <p class="text-slate-600 mb-3">Aponte a câmera para o QR Code e abra as inscrições deste evento para votar.</p>
+              <p id="evento-qr-url" class="text-sm break-all text-slate-500"></p>
+            </div>
+          </div>
+        </div>
 
         <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
           <h2 id="entries-title" class="text-2xl font-semibold">Inscrições</h2>
