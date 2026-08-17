@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Área do professor — Banca de TCC</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              navy: { 950: "#070b14", 900: "#0c1222", 800: "#141c2e", 700: "#1c2740", 600: "#243250" },
+              gold: { DEFAULT: "#d4a853", dim: "#b8923f", light: "#f3e2b6" },
+            },
+            fontFamily: {
+              serif: ["Fraunces", "Georgia", "serif"],
+              sans: ["Outfit", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="css/extra.css" />
+  </head>
+  <body data-page="admin" class="font-sans text-stone-100 antialiased">
+    <div id="firebase-banner" class="hidden bg-amber-500/15 border-b border-amber-500/30 text-amber-100 text-sm px-4 py-3 text-center">
+      Configure o Firebase em <code class="text-gold">js/firebase-config.js</code> para ativar cadastros e votos. Veja o README.
+    </div>
+
+    <header class="relative z-20 border-b border-white/10 bg-navy-950/70 backdrop-blur">
+      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+        <a href="index.html" class="flex items-center gap-3">
+          <span class="w-9 h-9 rounded-lg border border-gold/40 bg-navy-800 grid place-items-center text-gold font-serif">B</span>
+          <div>
+            <p class="text-[11px] uppercase tracking-[0.2em] text-gold/80">Evento acadêmico</p>
+            <p data-event-title class="font-serif text-lg leading-tight">Banca de TCC</p>
+          </div>
+        </a>
+        <nav class="flex flex-wrap items-center justify-end gap-1 text-sm">
+          <a class="px-3 py-2 rounded-lg text-stone-300 hover:text-white hover:bg-white/5" href="projetos.html">Projetos</a>
+          <a class="px-3 py-2 rounded-lg text-stone-300 hover:text-white hover:bg-white/5" href="cadastrar.html">Cadastrar</a>
+          <a class="px-3 py-2 rounded-lg border border-gold/30 bg-gold/10 text-gold" href="admin.html">Professor</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-12">
+      <section id="admin-login" class="max-w-md mx-auto">
+        <p class="text-xs uppercase tracking-[0.25em] text-gold mb-2">Acesso restrito</p>
+        <h1 class="font-serif text-4xl mb-3">Área do professor</h1>
+        <p class="text-stone-400 mb-8">Use o e-mail e a senha criados no Firebase Authentication.</p>
+        <form id="form-login" class="rounded-2xl border border-white/10 bg-navy-800/50 p-6 space-y-4">
+          <div>
+            <label for="admin-email" class="block text-sm mb-2 text-stone-300">E-mail</label>
+            <input id="admin-email" type="email" required class="w-full rounded-xl bg-navy-950 border border-white/10 px-4 py-3 outline-none focus:border-gold/50" />
+          </div>
+          <div>
+            <label for="admin-password" class="block text-sm mb-2 text-stone-300">Senha</label>
+            <input id="admin-password" type="password" required class="w-full rounded-xl bg-navy-950 border border-white/10 px-4 py-3 outline-none focus:border-gold/50" />
+          </div>
+          <button type="submit" class="w-full py-3 rounded-xl bg-gold text-navy-950 font-semibold hover:bg-gold-light">
+            Entrar
+          </button>
+        </form>
+      </section>
+
+      <section id="admin-panel" class="hidden space-y-8">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p class="text-xs uppercase tracking-[0.25em] text-gold mb-2">Painel</p>
+            <h1 class="font-serif text-4xl">Controle da banca</h1>
+          </div>
+          <button id="admin-logout" class="text-sm text-stone-400 hover:text-white">Sair</button>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-5">
+          <div class="rounded-2xl border border-white/10 bg-navy-800/50 p-6">
+            <h2 class="font-serif text-xl mb-2">Nome do evento</h2>
+            <form id="form-event-title" class="space-y-3">
+              <input id="event-title-input" maxlength="80" class="w-full rounded-xl bg-navy-950 border border-white/10 px-4 py-3 outline-none focus:border-gold/50" />
+              <button type="submit" class="text-sm text-gold hover:text-gold-light">Salvar nome</button>
+            </form>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-navy-800/50 p-6">
+            <h2 class="font-serif text-xl mb-2">Ordem das apresentações</h2>
+            <p id="draw-status" class="text-sm text-stone-400 mb-4">Ainda não sorteada.</p>
+            <button id="btn-sortear" class="w-full py-3 rounded-xl bg-gold text-navy-950 font-semibold hover:bg-gold-light">
+              Sortear ordem
+            </button>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-navy-800/50 p-6">
+            <h2 class="font-serif text-xl mb-2">Votação</h2>
+            <p id="voting-status" class="text-sm text-stone-400 mb-4">Fechada</p>
+            <button id="btn-votacao" class="w-full py-3 rounded-xl border border-white/15 hover:border-gold/40">
+              Abrir votação
+            </button>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-white/10 bg-navy-800/50 p-6 md:p-8">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+            <h2 class="font-serif text-2xl">Ranking</h2>
+            <p class="text-sm text-stone-500">Visível apenas para o professor</p>
+          </div>
+          <div id="ranking-empty" class="text-stone-400 text-sm">Ainda não há votos.</div>
+          <div id="ranking-table" class="hidden overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="text-stone-400 border-b border-white/10">
+                <tr>
+                  <th class="py-3 pr-3 font-medium">#</th>
+                  <th class="py-3 pr-3 font-medium">Projeto</th>
+                  <th class="py-3 pr-3 font-medium">Integrantes</th>
+                  <th class="py-3 pr-3 font-medium">Média</th>
+                  <th class="py-3 font-medium">Votos</th>
+                </tr>
+              </thead>
+              <tbody id="ranking-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-white/10 bg-navy-800/50 p-6 md:p-8">
+          <h2 class="font-serif text-2xl mb-4">Projetos cadastrados</h2>
+          <div id="admin-projects" class="space-y-3"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-white/10 py-8 text-center text-sm text-stone-500">
+      Banca de TCC · simulação de evento acadêmico
+    </footer>
+
+    <div id="toast-root" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+    <div class="hidden student-name remove-student tracking-[0.2em] hover:text-red-200 hover:border-red-400/30 border-white/5 line-clamp-3"></div>
+    <script type="module" src="js/admin.js"></script>
+  </body>
+</html>

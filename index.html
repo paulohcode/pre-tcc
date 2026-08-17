@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Banca de TCC — Simulação de apresentações</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              navy: { 950: "#070b14", 900: "#0c1222", 800: "#141c2e", 700: "#1c2740", 600: "#243250" },
+              gold: { DEFAULT: "#d4a853", dim: "#b8923f", light: "#f3e2b6" },
+            },
+            fontFamily: {
+              serif: ["Fraunces", "Georgia", "serif"],
+              sans: ["Outfit", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="css/extra.css" />
+  </head>
+  <body data-page="home" class="font-sans text-stone-100 antialiased">
+    <div id="firebase-banner" class="hidden bg-amber-500/15 border-b border-amber-500/30 text-amber-100 text-sm px-4 py-3 text-center">
+      Configure o Firebase em <code class="text-gold">js/firebase-config.js</code> para ativar cadastros e votos. Veja o README.
+    </div>
+
+    <header class="relative z-20 border-b border-white/10 bg-navy-950/70 backdrop-blur">
+      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+        <a href="index.html" class="flex items-center gap-3">
+          <span class="w-9 h-9 rounded-lg border border-gold/40 bg-navy-800 grid place-items-center text-gold font-serif">B</span>
+          <div>
+            <p class="text-[11px] uppercase tracking-[0.2em] text-gold/80">Evento acadêmico</p>
+            <p data-event-title class="font-serif text-lg leading-tight">Banca de TCC</p>
+          </div>
+        </a>
+        <nav class="flex flex-wrap items-center justify-end gap-1 text-sm">
+          <a class="px-3 py-2 rounded-lg text-stone-300 hover:text-white hover:bg-white/5" href="projetos.html">Projetos</a>
+          <a class="px-3 py-2 rounded-lg text-stone-300 hover:text-white hover:bg-white/5" href="cadastrar.html">Cadastrar</a>
+          <a class="px-3 py-2 rounded-lg border border-gold/30 text-gold hover:bg-gold/10" href="admin.html">Professor</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="relative overflow-hidden">
+        <div class="hero-grid absolute inset-0 pointer-events-none"></div>
+        <div class="relative max-w-6xl mx-auto px-4 pt-16 pb-20 md:pt-24 md:pb-28">
+          <p class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-gold border border-gold/30 rounded-full px-3 py-1 mb-6">
+            Simulação de banca
+          </p>
+          <h1 class="font-serif text-4xl md:text-6xl max-w-3xl leading-tight">
+            Apresentações de <span class="gold-text">TCC</span> em formato de evento
+          </h1>
+          <p class="mt-6 max-w-xl text-stone-300 text-lg font-light">
+            Cadastre o projeto da equipe, acompanhe a ordem sorteada das apresentações e avalie os trabalhos da turma com critérios claros.
+          </p>
+          <div class="mt-10 flex flex-wrap gap-3">
+            <a href="cadastrar.html" class="px-6 py-3 rounded-xl bg-gold text-navy-950 font-semibold hover:bg-gold-light transition">
+              Cadastrar projeto
+            </a>
+            <a href="projetos.html" class="px-6 py-3 rounded-xl border border-white/15 hover:border-gold/40 hover:bg-white/5 transition">
+              Ver projetos
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="max-w-6xl mx-auto px-4 pb-20 grid md:grid-cols-3 gap-5">
+        <article class="rounded-2xl border border-white/10 bg-navy-800/60 p-6">
+          <p class="text-gold text-sm tracking-widest uppercase mb-3">01</p>
+          <h2 class="font-serif text-2xl mb-2">Cadastre</h2>
+          <p class="text-stone-400">Informe os integrantes, o nome e a descrição do projeto. Qualquer aluno da turma pode cadastrar.</p>
+        </article>
+        <article class="rounded-2xl border border-white/10 bg-navy-800/60 p-6">
+          <p class="text-gold text-sm tracking-widest uppercase mb-3">02</p>
+          <h2 class="font-serif text-2xl mb-2">Apresente</h2>
+          <p class="text-stone-400">O professor sorteia a ordem das bancas. A lista pública mostra quem apresenta primeiro.</p>
+        </article>
+        <article class="rounded-2xl border border-white/10 bg-navy-800/60 p-6">
+          <p class="text-gold text-sm tracking-widest uppercase mb-3">03</p>
+          <h2 class="font-serif text-2xl mb-2">Vote</h2>
+          <p class="text-stone-400">Após cada apresentação, avalie clareza, inovação, apresentação e domínio. Um voto por aluno em cada projeto.</p>
+        </article>
+      </section>
+    </main>
+
+    <footer class="border-t border-white/10 py-8 text-center text-sm text-stone-500">
+      Banca de TCC · simulação de evento acadêmico
+    </footer>
+
+    <div id="toast-root" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+    <!-- classes usadas em HTML gerado por JS (Tailwind CDN) -->
+    <div class="hidden student-name remove-student tracking-[0.2em] hover:text-red-200 hover:border-red-400/30 border-white/5 line-clamp-3"></div>
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>

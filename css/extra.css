@@ -1,0 +1,94 @@
+:root {
+  --navy-950: #070b14;
+  --navy-900: #0c1222;
+  --navy-800: #141c2e;
+  --gold: #d4a853;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--navy-950);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(212, 168, 83, 0.12), transparent),
+    radial-gradient(ellipse 40% 40% at 100% 0%, rgba(59, 90, 160, 0.16), transparent);
+  min-height: 100vh;
+}
+
+.hero-grid {
+  background-image:
+    linear-gradient(rgba(212, 168, 83, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 168, 83, 0.07) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 80% at 50% 30%, black 20%, transparent 75%);
+}
+
+.gold-text {
+  background: linear-gradient(135deg, #f3e2b6 0%, #d4a853 45%, #a67c2a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.card-glow:hover {
+  box-shadow: 0 0 0 1px rgba(212, 168, 83, 0.35), 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: #1c2740;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f3e2b6, #d4a853);
+  cursor: pointer;
+  border: 2px solid #0c1222;
+  box-shadow: 0 0 0 3px rgba(212, 168, 83, 0.25);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #d4a853;
+  cursor: pointer;
+  border: 2px solid #0c1222;
+}
+
+.toast-enter {
+  animation: toast-in 0.28s ease-out;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.medal-1 { color: #f3e2b6; }
+.medal-2 { color: #c9d4e5; }
+.medal-3 { color: #d4a07a; }
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

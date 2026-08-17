@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Projetos — Banca de TCC</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              navy: { 950: "#070b14", 900: "#0c1222", 800: "#141c2e", 700: "#1c2740", 600: "#243250" },
+              gold: { DEFAULT: "#d4a853", dim: "#b8923f", light: "#f3e2b6" },
+            },
+            fontFamily: {
+              serif: ["Fraunces", "Georgia", "serif"],
+              sans: ["Outfit", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="css/extra.css" />
+  </head>
+  <body data-page="projetos" class="font-sans text-stone-100 antialiased">
+    <div id="firebase-banner" class="hidden bg-amber-500/15 border-b border-amber-500/30 text-amber-100 text-sm px-4 py-3 text-center">
+      Configure o Firebase em <code class="text-gold">js/firebase-config.js</code> para ativar cadastros e votos. Veja o README.
+    </div>
+
+    <header class="relative z-20 border-b border-white/10 bg-navy-950/70 backdrop-blur">
+      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+        <a href="index.html" class="flex items-center gap-3">
+          <span class="w-9 h-9 rounded-lg border border-gold/40 bg-navy-800 grid place-items-center text-gold font-serif">B</span>
+          <div>
+            <p class="text-[11px] uppercase tracking-[0.2em] text-gold/80">Evento acadêmico</p>
+            <p data-event-title class="font-serif text-lg leading-tight">Banca de TCC</p>
+          </div>
+        </a>
+        <nav class="flex flex-wrap items-center justify-end gap-1 text-sm">
+          <a class="px-3 py-2 rounded-lg bg-white/10 text-white" href="projetos.html">Projetos</a>
+          <a class="px-3 py-2 rounded-lg text-stone-300 hover:text-white hover:bg-white/5" href="cadastrar.html">Cadastrar</a>
+          <a class="px-3 py-2 rounded-lg border border-gold/30 text-gold hover:bg-gold/10" href="admin.html">Professor</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-12">
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-8">
+        <div>
+          <p class="text-xs uppercase tracking-[0.25em] text-gold mb-2">Programação</p>
+          <h1 class="font-serif text-4xl">Projetos da banca</h1>
+        </div>
+        <p id="order-status" class="text-sm text-stone-400"></p>
+      </div>
+
+      <div id="projetos-loading" class="text-stone-400">Carregando projetos…</div>
+      <div id="projetos-empty" class="hidden rounded-2xl border border-dashed border-white/15 p-10 text-center text-stone-400">
+        Nenhum projeto cadastrado ainda.
+        <a class="text-gold hover:underline ml-1" href="cadastrar.html">Seja o primeiro</a>.
+      </div>
+      <div id="projetos-grid" class="grid md:grid-cols-2 gap-5"></div>
+    </main>
+
+    <footer class="border-t border-white/10 py-8 text-center text-sm text-stone-500">
+      Banca de TCC · simulação de evento acadêmico
+    </footer>
+
+    <div id="toast-root" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+    <div class="hidden student-name remove-student tracking-[0.2em] hover:text-red-200 hover:border-red-400/30 border-white/5 line-clamp-3"></div>
+    <script type="module" src="js/projetos.js"></script>
+  </body>
+</html>

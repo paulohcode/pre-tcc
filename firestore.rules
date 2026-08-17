@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+    // Opcional: use isAdmin() no lugar de signedIn() nas escritas
+    // function isAdmin() {
+    //   return signedIn() && request.auth.token.email == 'seu.email@escola.com';
+    // }
+
+    match /projects/{projectId} {
+      allow read: if true;
+      allow create: if request.resource.data.title is string
+                    && request.resource.data.title.size() > 0
+                    && request.resource.data.description is string
+                    && request.resource.data.students is list
+                    && request.resource.data.students.size() > 0;
+      allow update, delete: if signedIn();
+    }
+
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if signedIn();
+    }
+
+    match /voters/{voterId} {
+      allow get: if true;
+      allow list: if signedIn();
+      allow create: if request.resource.data.name is string
+                    && request.resource.data.pinHash is string;
+      allow update, delete: if false;
+    }
+
+    match /votes/{voteId} {
+      allow get: if true;
+      allow list: if signedIn();
+      allow create: if request.resource.data.projectId is string
+                    && request.resource.data.voterId is string
+                    && voteId == request.resource.data.voterId + '_' + request.resource.data.projectId;
+      allow update, delete: if signedIn();
+    }
+  }
+}
