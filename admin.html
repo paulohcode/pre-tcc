@@ -3,232 +3,245 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Área do professor — Banca de TCC</title>
+    <title>Área interna — SESI SENAI Umuarama</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              navy: { 950: "#05060c", 900: "#0a0d16", 800: "#12182a", 700: "#1c2740", 600: "#243250" },
-              gold: { DEFAULT: "#c9a56a", dim: "#a98442", light: "#f0e1b8" },
+              blue: { DEFAULT: "#003da5", dark: "#002c75", mid: "#0057b8", pale: "#e8f1fb" },
+              orange: "#f39200",
             },
-            fontFamily: {
-              display: ["Cinzel", "Georgia", "serif"],
-              serif: ["Cormorant Garamond", "Georgia", "serif"],
-              sans: ["Outfit", "system-ui", "sans-serif"],
-            },
+            fontFamily: { sans: ["Outfit", "system-ui", "sans-serif"] },
           },
         },
       };
     </script>
     <link rel="stylesheet" href="css/extra.css" />
   </head>
-  <body data-page="admin" class="font-sans text-stone-100 antialiased">
-    <div id="firebase-banner" class="hidden bg-amber-500/15 border-b border-amber-500/30 text-amber-100 text-sm px-4 py-3 text-center">
-      Configure o Firebase em <code class="text-gold">js/firebase-config.js</code> para ativar cadastros e votos. Veja o README.
+  <body data-page="admin" class="font-sans antialiased">
+    <div id="firebase-banner" class="hidden bg-amber-100 text-amber-900 text-sm px-4 py-3 text-center">
+      Configure o Firebase em <code>js/firebase-config.js</code> para ativar cadastros e votos.
     </div>
 
-    <header class="site-header relative z-20">
-      <div class="header-rail"></div>
-      <div class="max-w-6xl mx-auto px-4 py-5 flex items-center justify-between gap-4">
-        <a href="index.html" class="flex items-center gap-3">
-          <span class="logo-mark text-lg">B</span>
+    <header class="site-header">
+      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+        <a href="index.html" class="flex items-center gap-3 text-white">
+          <span class="logo-mark">SESI<br />SENAI</span>
           <div>
-            <p class="font-display text-[10px] uppercase tracking-[0.32em] text-gold/80">Evento acadêmico</p>
-            <p data-event-title class="font-serif text-xl leading-tight">Banca de TCC</p>
+            <p class="text-[11px] uppercase tracking-[0.18em] text-white/70">Umuarama</p>
+            <p class="font-semibold leading-tight">Portal de eventos</p>
           </div>
         </a>
-        <nav class="flex flex-wrap items-center justify-end gap-1">
-          <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="index.html#projetos">Projetos</a>
-          <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="cadastrar.html">Cadastrar</a>
-          <a class="nav-link is-active px-3 py-2 text-gold" href="admin.html">Professor</a>
+        <nav class="flex items-center gap-1">
+          <a class="nav-link px-3 py-2" href="index.html">Eventos</a>
+          <a class="nav-link is-active px-3 py-2" href="admin.html">Área interna</a>
         </nav>
       </div>
     </header>
 
     <main class="max-w-6xl mx-auto px-4 py-12">
       <section id="admin-login" class="max-w-md mx-auto">
-        <p class="section-title mb-2">Acesso restrito</p>
-        <h1 class="font-serif text-5xl mb-3">Área do professor</h1>
-        <p class="ornament ornament-sm mb-6">✦</p>
-        <p class="text-stone-400 mb-8">Use o e-mail e a senha criados no Firebase Authentication.</p>
+        <p class="kicker mb-2">Acesso restrito</p>
+        <h1 class="text-4xl font-semibold mb-3">Área interna</h1>
+        <p class="text-slate-600 mb-8">Use o e-mail e a senha do Firebase Authentication para cadastrar eventos.</p>
         <form id="form-login" class="panel p-8 space-y-4">
           <div>
-            <label for="admin-email" class="block text-sm mb-2 text-stone-300">E-mail</label>
-            <input id="admin-email" type="email" required class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" />
+            <label for="admin-email" class="block text-sm mb-2">E-mail</label>
+            <input id="admin-email" type="email" required class="field" />
           </div>
           <div>
-            <label for="admin-password" class="block text-sm mb-2 text-stone-300">Senha</label>
-            <input id="admin-password" type="password" required class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" />
+            <label for="admin-password" class="block text-sm mb-2">Senha</label>
+            <input id="admin-password" type="password" required class="field" />
           </div>
-          <button type="submit" class="btn-gold w-full py-3">
-            Entrar
-          </button>
+          <button type="submit" class="btn-primary w-full py-3">Entrar</button>
         </form>
       </section>
 
       <section id="admin-panel" class="hidden space-y-8">
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p class="section-title mb-2">Painel</p>
-            <h1 class="font-serif text-5xl">Controle da banca</h1>
+            <p class="kicker mb-2">Professor</p>
+            <h1 class="text-4xl font-semibold">Gestão de eventos</h1>
           </div>
-          <button id="admin-logout" class="text-sm text-stone-400 hover:text-white">Sair</button>
+          <button id="admin-logout" class="text-sm text-slate-500 hover:text-slate-800">Sair</button>
         </div>
 
-        <form id="form-evento" class="panel p-6 md:p-8 space-y-6">
+        <div id="events-list-view" class="space-y-8">
+          <form id="form-novo-evento" class="panel p-8 space-y-5">
+            <h2 class="text-2xl font-semibold">Cadastrar evento</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="md:col-span-2">
+                <label for="new-title" class="block text-sm mb-2">Nome do evento</label>
+                <input id="new-title" required maxlength="80" class="field" placeholder="Ex.: Banca de TCC 2026" />
+              </div>
+              <div>
+                <label for="new-type" class="block text-sm mb-2">Tipo</label>
+                <select id="new-type" class="field">
+                  <option value="projetos">Projetos</option>
+                  <option value="concurso">Concurso</option>
+                </select>
+              </div>
+              <div>
+                <label for="new-class" class="block text-sm mb-2">Turma</label>
+                <input id="new-class" maxlength="80" class="field" />
+              </div>
+              <div>
+                <label for="new-date" class="block text-sm mb-2">Data</label>
+                <input id="new-date" type="date" class="field" />
+              </div>
+              <div>
+                <label for="new-time" class="block text-sm mb-2">Horário</label>
+                <input id="new-time" type="time" class="field" />
+              </div>
+              <div class="md:col-span-2">
+                <label for="new-location" class="block text-sm mb-2">Local</label>
+                <input id="new-location" maxlength="80" class="field" placeholder="Ex.: Auditório SESI SENAI Umuarama" />
+              </div>
+              <div class="md:col-span-2">
+                <label for="new-description" class="block text-sm mb-2">Descrição</label>
+                <textarea id="new-description" rows="3" maxlength="1000" class="field resize-y"></textarea>
+              </div>
+            </div>
+            <button type="submit" class="btn-primary px-5 py-3">Publicar evento</button>
+          </form>
+
           <div>
-            <p class="section-title mb-2">Cadastro do evento</p>
-            <h2 class="font-serif text-3xl">Dados que aparecem na home</h2>
-            <p class="text-sm text-stone-400 mt-2">Banner, detalhes e a lista de projetos usam estas informações.</p>
-          </div>
-          <div class="grid md:grid-cols-2 gap-4">
-            <div class="md:col-span-2">
-              <label for="event-title-input" class="block text-sm mb-2 text-stone-300">Nome do evento</label>
-              <input id="event-title-input" maxlength="80" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" />
-            </div>
-            <div>
-              <label for="event-eyebrow-input" class="block text-sm mb-2 text-stone-300">Linha do banner</label>
-              <input id="event-eyebrow-input" maxlength="80" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" placeholder="Ex.: Apresentação comercial de TCC" />
-            </div>
-            <div>
-              <label for="event-subtitle-input" class="block text-sm mb-2 text-stone-300">Subtítulo</label>
-              <input id="event-subtitle-input" maxlength="140" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" />
-            </div>
-            <div>
-              <label for="event-date-input" class="block text-sm mb-2 text-stone-300">Data</label>
-              <input id="event-date-input" type="date" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" />
-            </div>
-            <div>
-              <label for="event-time-input" class="block text-sm mb-2 text-stone-300">Horário</label>
-              <input id="event-time-input" type="time" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" />
-            </div>
-            <div>
-              <label for="event-location-input" class="block text-sm mb-2 text-stone-300">Local</label>
-              <input id="event-location-input" maxlength="80" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" placeholder="Ex.: Auditório" />
-            </div>
-            <div>
-              <label for="event-class-input" class="block text-sm mb-2 text-stone-300">Turma</label>
-              <input id="event-class-input" maxlength="80" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" placeholder="Ex.: 3º ano — Desenvolvimento de Sistemas" />
-            </div>
-            <div class="md:col-span-2">
-              <label for="event-description-input" class="block text-sm mb-2 text-stone-300">Descrição</label>
-              <textarea id="event-description-input" rows="4" maxlength="1000" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50 resize-y"></textarea>
-            </div>
-          </div>
-          <button type="submit" class="btn-gold px-6 py-3">Salvar evento</button>
-        </form>
-
-        <div class="grid md:grid-cols-2 gap-5">
-          <div class="panel p-6">
-            <h2 class="font-serif text-2xl mb-2">Ordem das apresentações</h2>
-            <p id="draw-status" class="text-sm text-stone-400 mb-4">Ainda não sorteada.</p>
-            <button id="btn-sortear" class="btn-gold w-full py-3">
-              Sortear ordem
-            </button>
-          </div>
-          <div class="panel p-6">
-            <h2 class="font-serif text-2xl mb-2">Votação</h2>
-            <p id="voting-status" class="text-sm text-stone-400 mb-4">Fechada</p>
-            <button id="btn-votacao" class="btn-ghost w-full py-3">
-              Abrir votação
-            </button>
+            <h2 class="text-2xl font-semibold mb-4">Eventos cadastrados</h2>
+            <div id="admin-events" class="space-y-3"></div>
           </div>
         </div>
 
-        <div class="panel p-6 md:p-8">
-          <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
-            <h2 class="font-serif text-3xl">Ranking</h2>
-            <p class="font-display text-[10px] tracking-[0.2em] uppercase text-stone-500">Visível apenas para o professor</p>
-          </div>
-          <div id="ranking-empty" class="text-stone-400 text-sm">Ainda não há votos.</div>
-          <div id="ranking-table" class="hidden overflow-x-auto">
-            <table class="w-full text-left text-sm">
-              <thead class="text-stone-400 border-b border-gold/15">
-                <tr>
-                  <th class="py-3 pr-3 font-medium">#</th>
-                  <th class="py-3 pr-3 font-medium">Projeto</th>
-                  <th class="py-3 pr-3 font-medium">Integrantes</th>
-                  <th class="py-3 pr-3 font-medium">Média</th>
-                  <th class="py-3 font-medium">Votos</th>
-                </tr>
-              </thead>
-              <tbody id="ranking-body"></tbody>
-            </table>
-          </div>
-        </div>
+        <div id="event-detail-view" class="hidden space-y-8">
+          <button type="button" id="btn-back-events" class="text-sm text-blue hover:underline">← Todos os eventos</button>
 
-        <div id="admin-edit" class="hidden panel p-6 md:p-8">
-          <div class="flex flex-wrap items-start justify-between gap-3 mb-6">
-            <div>
-              <p class="font-display text-[11px] uppercase tracking-[0.35em] text-gold mb-2">Edição</p>
-              <h2 class="font-serif text-3xl">Editar projeto</h2>
+          <form id="form-evento" class="panel p-8 space-y-5">
+            <input type="hidden" id="event-id" />
+            <h2 class="text-2xl font-semibold">Dados do evento</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="md:col-span-2">
+                <label for="event-title-input" class="block text-sm mb-2">Nome</label>
+                <input id="event-title-input" maxlength="80" class="field" />
+              </div>
+              <div>
+                <label for="event-type-input" class="block text-sm mb-2">Tipo</label>
+                <select id="event-type-input" class="field">
+                  <option value="projetos">Projetos</option>
+                  <option value="concurso">Concurso</option>
+                </select>
+              </div>
+              <div>
+                <label for="event-class-input" class="block text-sm mb-2">Turma</label>
+                <input id="event-class-input" maxlength="80" class="field" />
+              </div>
+              <div>
+                <label for="event-date-input" class="block text-sm mb-2">Data</label>
+                <input id="event-date-input" type="date" class="field" />
+              </div>
+              <div>
+                <label for="event-time-input" class="block text-sm mb-2">Horário</label>
+                <input id="event-time-input" type="time" class="field" />
+              </div>
+              <div class="md:col-span-2">
+                <label for="event-location-input" class="block text-sm mb-2">Local</label>
+                <input id="event-location-input" maxlength="80" class="field" />
+              </div>
+              <div class="md:col-span-2">
+                <label for="event-description-input" class="block text-sm mb-2">Descrição</label>
+                <textarea id="event-description-input" rows="4" maxlength="1000" class="field resize-y"></textarea>
+              </div>
             </div>
-            <button type="button" id="edit-cancel" class="text-sm text-stone-400 hover:text-white">Fechar</button>
-          </div>
-          <form id="form-edit-projeto" class="space-y-6">
-            <input type="hidden" id="edit-project-id" />
-            <div>
-              <label for="edit-title" class="block text-sm mb-2 text-stone-300">Nome do projeto</label>
-              <input
-                id="edit-title"
-                required
-                maxlength="120"
-                class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50"
-              />
-            </div>
-            <div>
-              <label class="block text-sm mb-2 text-stone-300">Integrantes</label>
-              <div id="edit-students-list" class="space-y-3"></div>
-              <button type="button" id="edit-add-student" class="mt-3 text-sm text-gold hover:text-gold-light">
-                + Adicionar integrante
-              </button>
-            </div>
-            <div>
-              <label for="edit-description" class="block text-sm mb-2 text-stone-300">Descrição</label>
-              <textarea
-                id="edit-description"
-                required
-                rows="5"
-                maxlength="2000"
-                class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50 resize-y"
-              ></textarea>
-            </div>
-            <div class="flex flex-wrap items-center gap-4">
-              <button type="submit" id="edit-save" class="btn-gold px-5 py-3 disabled:opacity-50">
-                Salvar alterações
-              </button>
-              <a id="edit-view-public" href="projetos.html" class="text-sm text-stone-400 hover:text-white">
-                Ver página pública
-              </a>
+            <div class="flex flex-wrap gap-3">
+              <button type="submit" class="btn-primary px-5 py-3">Salvar evento</button>
+              <a id="event-view-public" href="index.html" class="btn-outline px-5 py-3">Ver página pública</a>
             </div>
           </form>
-        </div>
 
-        <div class="panel p-6 md:p-8">
-          <h2 class="font-serif text-3xl mb-2">Projetos cadastrados</h2>
-          <p class="text-sm text-stone-500 mb-4">Abra um projeto para ver os detalhes e ajustar a lista de integrantes.</p>
-          <div id="admin-projects" class="space-y-3"></div>
+          <div class="grid md:grid-cols-2 gap-5">
+            <div class="panel p-6">
+              <h2 class="text-xl font-semibold mb-2">Ordem das apresentações</h2>
+              <p id="draw-status" class="text-sm text-slate-500 mb-4">Ainda não sorteada.</p>
+              <button id="btn-sortear" class="btn-primary w-full py-3">Sortear ordem</button>
+            </div>
+            <div class="panel p-6">
+              <h2 class="text-xl font-semibold mb-2">Votação</h2>
+              <p id="voting-status" class="text-sm text-slate-500 mb-4">Fechada</p>
+              <button id="btn-votacao" class="btn-outline w-full py-3">Abrir votação</button>
+            </div>
+          </div>
+
+          <div class="panel p-6 md:p-8">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+              <h2 class="text-2xl font-semibold">Ranking</h2>
+              <p class="text-xs uppercase tracking-wide text-slate-400">Visível apenas na área interna</p>
+            </div>
+            <div id="ranking-empty" class="text-slate-500 text-sm">Ainda não há votos.</div>
+            <div id="ranking-table" class="hidden overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="text-slate-500 border-b border-slate-200">
+                  <tr>
+                    <th class="py-3 pr-3 font-medium">#</th>
+                    <th class="py-3 pr-3 font-medium">Inscrição</th>
+                    <th class="py-3 pr-3 font-medium">Integrantes</th>
+                    <th class="py-3 pr-3 font-medium">Média</th>
+                    <th class="py-3 font-medium">Votos</th>
+                  </tr>
+                </thead>
+                <tbody id="ranking-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="admin-edit" class="hidden panel p-8">
+            <div class="flex flex-wrap items-start justify-between gap-3 mb-6">
+              <div>
+                <p class="kicker mb-2">Edição</p>
+                <h2 class="text-2xl font-semibold">Editar inscrição</h2>
+              </div>
+              <button type="button" id="edit-cancel" class="text-sm text-slate-500">Fechar</button>
+            </div>
+            <form id="form-edit-projeto" class="space-y-6">
+              <input type="hidden" id="edit-project-id" />
+              <div>
+                <label for="edit-title" class="block text-sm mb-2">Nome</label>
+                <input id="edit-title" required maxlength="120" class="field" />
+              </div>
+              <div>
+                <label class="block text-sm mb-2">Integrantes</label>
+                <div id="edit-students-list" class="space-y-3"></div>
+                <button type="button" id="edit-add-student" class="mt-3 text-sm text-blue hover:underline">+ Adicionar integrante</button>
+              </div>
+              <div>
+                <label for="edit-description" class="block text-sm mb-2">Descrição</label>
+                <textarea id="edit-description" required rows="5" maxlength="2000" class="field resize-y"></textarea>
+              </div>
+              <div class="flex flex-wrap items-center gap-4">
+                <button type="submit" id="edit-save" class="btn-primary px-5 py-3 disabled:opacity-50">Salvar alterações</button>
+                <a id="edit-view-public" href="index.html" class="text-sm text-slate-500 hover:text-slate-800">Ver página pública</a>
+              </div>
+            </form>
+          </div>
+
+          <div class="panel p-8">
+            <h2 id="admin-entries-title" class="text-2xl font-semibold mb-2">Inscrições</h2>
+            <p class="text-sm text-slate-500 mb-4">Projetos ou trabalhos deste evento.</p>
+            <div id="admin-projects" class="space-y-3"></div>
+          </div>
         </div>
       </section>
     </main>
 
-    <footer class="site-footer py-12 text-center">
-      <p class="font-display text-[10px] tracking-[0.4em] text-gold/80 uppercase">Banca de TCC</p>
-      <p class="ornament justify-center my-4">✦</p>
-      <p class="text-sm text-stone-500">Simulação de apresentações comerciais · evento acadêmico</p>
+    <footer class="site-footer py-8 text-center text-sm">
+      SESI SENAI Umuarama · portal de eventos
     </footer>
 
     <div id="toast-root" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
-    <div class="hidden student-name remove-student tracking-[0.2em] hover:text-red-200 hover:border-red-400/30 border-white/5 line-clamp-3"></div>
+    <div class="hidden p-4 flex items-center justify-between gap-3 font-semibold text-sm text-slate-500 text-slate-400 hover:underline hover:text-red-600 border border-slate-200 px-4 py-4 min-w-0 flex-1 shrink-0 text-xs uppercase tracking-wide text-blue"></div>
     <script type="module" src="js/admin.js"></script>
   </body>
 </html>

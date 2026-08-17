@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cadastrar — SESI SENAI Umuarama</title>
+    <title>Evento — SESI SENAI Umuarama</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -24,7 +24,7 @@
     </script>
     <link rel="stylesheet" href="css/extra.css" />
   </head>
-  <body data-page="cadastrar" class="font-sans antialiased">
+  <body data-page="evento" class="font-sans antialiased">
     <div id="firebase-banner" class="hidden bg-amber-100 text-amber-900 text-sm px-4 py-3 text-center">
       Configure o Firebase em <code>js/firebase-config.js</code> para ativar cadastros e votos.
     </div>
@@ -45,34 +45,32 @@
       </div>
     </header>
 
-    <main class="max-w-2xl mx-auto px-4 py-12">
-      <a id="back-evento" href="index.html" class="text-sm text-blue hover:underline">← Voltar ao evento</a>
-      <p class="kicker mt-6 mb-2">Inscrição</p>
-      <h1 id="page-title" class="text-4xl font-semibold mb-3">Cadastrar</h1>
-      <p id="page-lead" class="text-slate-600 mb-8">Inclua todos os integrantes. Use nome e sobrenome para evitar confusão na hora do voto.</p>
+    <main class="max-w-6xl mx-auto px-4 py-10">
+      <a href="index.html" class="text-sm text-blue hover:underline">← Todos os eventos</a>
 
-      <div id="missing-event" class="hidden panel p-8 text-slate-600">
-        Selecione um evento na página inicial para cadastrar um projeto ou trabalho.
+      <div id="evento-loading" class="mt-8 text-slate-500">Carregando evento…</div>
+      <div id="evento-missing" class="hidden mt-8 text-slate-500">Evento não encontrado.</div>
+
+      <div id="evento-content" class="hidden mt-8">
+        <div class="flex flex-wrap items-start justify-between gap-4 mb-8">
+          <div>
+            <span id="evento-type" class="badge mb-3"></span>
+            <h1 id="evento-title" class="text-4xl md:text-5xl font-semibold mt-3"></h1>
+            <p id="evento-description" class="text-slate-600 mt-4 max-w-3xl"></p>
+          </div>
+          <a id="evento-register" href="cadastrar.html" class="btn-primary px-5 py-3">Cadastrar</a>
+        </div>
+
+        <div id="evento-facts" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12"></div>
+
+        <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+          <h2 id="entries-title" class="text-2xl font-semibold">Inscrições</h2>
+          <p id="order-status" class="text-sm text-slate-500"></p>
+        </div>
+        <div id="projetos-loading" class="text-slate-500">Carregando inscrições…</div>
+        <div id="projetos-empty" class="hidden panel p-10 text-center text-slate-500"></div>
+        <div id="projetos-grid" class="grid md:grid-cols-2 gap-5"></div>
       </div>
-
-      <form id="form-projeto" class="panel p-8 space-y-6">
-        <div>
-          <label class="block text-sm mb-2">Integrantes</label>
-          <div id="students-list" class="space-y-3"></div>
-          <button type="button" id="add-student" class="mt-3 text-sm text-blue hover:underline">
-            + Adicionar integrante
-          </button>
-        </div>
-        <div>
-          <label for="title" class="block text-sm mb-2">Nome</label>
-          <input id="title" name="title" required maxlength="120" class="field" placeholder="Nome do projeto ou trabalho" />
-        </div>
-        <div>
-          <label for="description" class="block text-sm mb-2">Descrição</label>
-          <textarea id="description" name="description" required rows="5" maxlength="2000" class="field resize-y" placeholder="Resumo do que será apresentado."></textarea>
-        </div>
-        <button type="submit" id="submit-projeto" class="btn-primary w-full py-3 disabled:opacity-50">Publicar</button>
-      </form>
     </main>
 
     <footer class="site-footer py-8 text-center text-sm">
@@ -80,6 +78,7 @@
     </footer>
 
     <div id="toast-root" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
-    <script type="module" src="js/cadastrar.js"></script>
+    <div class="hidden p-4 p-5 p-6 mb-2 mb-3 mb-4 mt-4 text-2xl text-xl text-sm text-xs font-semibold font-medium flex items-start justify-between gap-3 gap-4 text-slate-400 text-slate-500 text-slate-600 text-blue hover:underline border border-slate-200 px-4 py-4 line-clamp-3 uppercase tracking-wide"></div>
+    <script type="module" src="js/evento.js"></script>
   </body>
 </html>

@@ -3,136 +3,108 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Projeto — Banca de TCC</title>
+    <title>Inscrição — SESI SENAI Umuarama</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              navy: { 950: "#05060c", 900: "#0a0d16", 800: "#12182a", 700: "#1c2740", 600: "#243250" },
-              gold: { DEFAULT: "#c9a56a", dim: "#a98442", light: "#f0e1b8" },
+              blue: { DEFAULT: "#003da5", dark: "#002c75", mid: "#0057b8", pale: "#e8f1fb" },
+              orange: "#f39200",
             },
-            fontFamily: {
-              display: ["Cinzel", "Georgia", "serif"],
-              serif: ["Cormorant Garamond", "Georgia", "serif"],
-              sans: ["Outfit", "system-ui", "sans-serif"],
-            },
+            fontFamily: { sans: ["Outfit", "system-ui", "sans-serif"] },
           },
         },
       };
     </script>
     <link rel="stylesheet" href="css/extra.css" />
   </head>
-  <body data-page="projeto" class="font-sans text-stone-100 antialiased">
-    <div id="firebase-banner" class="hidden bg-amber-500/15 border-b border-amber-500/30 text-amber-100 text-sm px-4 py-3 text-center">
-      Configure o Firebase em <code class="text-gold">js/firebase-config.js</code> para ativar cadastros e votos. Veja o README.
+  <body data-page="projeto" class="font-sans antialiased">
+    <div id="firebase-banner" class="hidden bg-amber-100 text-amber-900 text-sm px-4 py-3 text-center">
+      Configure o Firebase em <code>js/firebase-config.js</code> para ativar cadastros e votos.
     </div>
 
-    <header class="site-header relative z-20">
-      <div class="header-rail"></div>
-      <div class="max-w-6xl mx-auto px-4 py-5 flex items-center justify-between gap-4">
-        <a href="index.html" class="flex items-center gap-3">
-          <span class="logo-mark text-lg">B</span>
+    <header class="site-header">
+      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+        <a href="index.html" class="flex items-center gap-3 text-white">
+          <span class="logo-mark">SESI<br />SENAI</span>
           <div>
-            <p class="font-display text-[10px] uppercase tracking-[0.32em] text-gold/80">Evento acadêmico</p>
-            <p data-event-title class="font-serif text-xl leading-tight">Banca de TCC</p>
+            <p class="text-[11px] uppercase tracking-[0.18em] text-white/70">Umuarama</p>
+            <p class="font-semibold leading-tight">Portal de eventos</p>
           </div>
         </a>
-        <nav class="flex flex-wrap items-center justify-end gap-1">
-          <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="index.html#projetos">Projetos</a>
-          <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="cadastrar.html">Cadastrar</a>
-          <a class="nav-link px-3 py-2 text-gold" href="admin.html">Professor</a>
+        <nav class="flex items-center gap-1">
+          <a class="nav-link px-3 py-2" href="index.html">Eventos</a>
+          <a class="nav-link px-3 py-2" href="admin.html">Área interna</a>
         </nav>
       </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 py-12">
-      <a href="index.html#projetos" class="font-display text-[11px] tracking-[0.2em] uppercase text-stone-400 hover:text-gold">← Projetos do evento</a>
+    <main class="max-w-6xl mx-auto px-4 py-10">
+      <a id="back-evento" href="index.html" class="text-sm text-blue hover:underline">← Voltar ao evento</a>
 
-      <div id="projeto-loading" class="mt-8 text-stone-400">Carregando…</div>
-      <div id="projeto-missing" class="hidden mt-8 text-stone-400">Projeto não encontrado.</div>
+      <div id="projeto-loading" class="mt-8 text-slate-500">Carregando…</div>
+      <div id="projeto-missing" class="hidden mt-8 text-slate-500">Inscrição não encontrada.</div>
 
       <div id="projeto-content" class="hidden mt-8 grid lg:grid-cols-[1.2fr_0.8fr] gap-8">
-        <article class="panel p-8 md:p-10">
-          <p id="projeto-order" class="font-display text-[11px] uppercase tracking-[0.28em] text-gold mb-4"></p>
-          <h1 id="projeto-title" class="font-serif text-4xl md:text-5xl mb-4"></h1>
-          <p class="ornament ornament-sm mb-6">✦</p>
-          <p id="projeto-students" class="text-stone-300 mb-6"></p>
-          <p id="projeto-description" class="text-stone-400 leading-relaxed whitespace-pre-wrap"></p>
+        <article class="panel p-8">
+          <p id="projeto-order" class="kicker mb-3"></p>
+          <h1 id="projeto-title" class="text-4xl font-semibold mb-4"></h1>
+          <p id="projeto-students" class="text-slate-600 mb-6"></p>
+          <p id="projeto-description" class="text-slate-600 leading-relaxed whitespace-pre-wrap"></p>
         </article>
 
-        <aside class="panel p-8 md:p-10 h-fit">
-          <p class="font-display text-[10px] tracking-[0.28em] text-gold uppercase">Avaliação da banca</p>
-          <h2 class="font-serif text-3xl mt-2 mb-1">Avaliar apresentação</h2>
-          <p class="text-sm text-stone-400 mb-6">Notas de 0 a 10 em cada critério. A média entra no ranking da noite.</p>
+        <aside class="panel p-8 h-fit">
+          <p class="kicker mb-2">Votação</p>
+          <h2 id="vote-title" class="text-2xl font-semibold mb-1">Avaliar</h2>
+          <p class="text-sm text-slate-500 mb-6">Notas de 0 a 10 em cada critério. A média entra no ranking do evento.</p>
 
-          <div id="vote-closed" class="hidden text-stone-400 text-sm border border-gold/15 p-4">
-            A votação ainda não foi aberta pelo professor.
+          <div id="vote-closed" class="hidden text-slate-600 text-sm border border-slate-200 p-4">
+            A votação ainda não foi aberta.
           </div>
-
-          <div id="vote-own" class="hidden text-stone-400 text-sm border border-gold/15 p-4">
-            Você faz parte desta equipe e não pode votar no próprio projeto.
+          <div id="vote-own" class="hidden text-slate-600 text-sm border border-slate-200 p-4">
+            Você faz parte desta equipe e não pode votar na própria inscrição.
           </div>
-
-          <div id="vote-done" class="hidden text-emerald-200/90 text-sm border border-emerald-500/20 bg-emerald-500/10 p-4">
-            Seu voto neste projeto já foi registrado.
+          <div id="vote-done" class="hidden text-emerald-800 text-sm border border-emerald-200 bg-emerald-50 p-4">
+            Seu voto já foi registrado.
           </div>
 
           <form id="form-ident" class="hidden space-y-4">
             <div>
-              <label for="voter-name" class="block text-sm mb-2 text-stone-300">Seu nome (como no cadastro)</label>
-              <select id="voter-name" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50">
+              <label for="voter-name" class="block text-sm mb-2">Seu nome (como no cadastro)</label>
+              <select id="voter-name" class="field">
                 <option value="">Selecione</option>
               </select>
             </div>
             <div>
-              <label for="voter-pin" class="block text-sm mb-2 text-stone-300">PIN de 4 dígitos</label>
-              <input
-                id="voter-pin"
-                inputmode="numeric"
-                maxlength="4"
-                pattern="[0-9]{4}"
-                class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50 tracking-[0.4em]"
-                placeholder="••••"
-              />
-              <p class="text-xs text-stone-500 mt-2">Na primeira votação este PIN é criado. Nas próximas, use o mesmo.</p>
+              <label for="voter-pin" class="block text-sm mb-2">PIN de 4 dígitos</label>
+              <input id="voter-pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" class="field tracking-[0.4em]" placeholder="••••" />
+              <p class="text-xs text-slate-500 mt-2">Na primeira votação este PIN é criado. Nas próximas, use o mesmo.</p>
             </div>
-            <button type="submit" class="btn-gold w-full py-3">
-              Continuar para votar
-            </button>
+            <button type="submit" class="btn-primary w-full py-3">Continuar para votar</button>
           </form>
 
           <form id="form-voto" class="hidden space-y-5">
-            <p id="voter-session" class="text-sm text-stone-400"></p>
+            <p id="voter-session" class="text-sm text-slate-500"></p>
             <div id="criteria-fields" class="space-y-5"></div>
-            <p class="text-sm text-stone-300">Média deste voto: <span id="vote-preview" class="text-gold font-semibold">5.0</span></p>
-            <button type="submit" id="submit-voto" class="btn-gold w-full py-3 disabled:opacity-50">
-              Enviar voto
-            </button>
-            <button type="button" id="logout-aluno" class="w-full text-sm text-stone-500 hover:text-stone-300">
-              Trocar de aluno
-            </button>
+            <p class="text-sm">Média deste voto: <span id="vote-preview" class="text-blue font-semibold">5.0</span></p>
+            <button type="submit" id="submit-voto" class="btn-primary w-full py-3 disabled:opacity-50">Enviar voto</button>
+            <button type="button" id="logout-aluno" class="w-full text-sm text-slate-500 hover:text-slate-800">Trocar de aluno</button>
           </form>
         </aside>
       </div>
     </main>
 
-    <footer class="site-footer py-12 text-center">
-      <p class="font-display text-[10px] tracking-[0.4em] text-gold/80 uppercase">Banca de TCC</p>
-      <p class="ornament justify-center my-4">✦</p>
-      <p class="text-sm text-stone-500">Simulação de apresentações comerciais · evento acadêmico</p>
+    <footer class="site-footer py-8 text-center text-sm">
+      SESI SENAI Umuarama · portal de eventos
     </footer>
 
     <div id="toast-root" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
-    <div class="hidden student-name remove-student tracking-[0.2em] hover:text-red-200 hover:border-red-400/30 border-white/5 line-clamp-3"></div>
     <script type="module" src="js/projeto.js"></script>
   </body>
 </html>

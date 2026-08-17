@@ -3,128 +3,72 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Banca de TCC</title>
+    <title>Eventos — SESI SENAI Umuarama</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              navy: { 950: "#070b14", 900: "#0c1222", 800: "#141c2e", 700: "#1c2740", 600: "#243250" },
-              gold: { DEFAULT: "#c9a56a", dim: "#a98442", light: "#f0e1b8" },
+              blue: { DEFAULT: "#003da5", dark: "#002c75", mid: "#0057b8", pale: "#e8f1fb" },
+              orange: "#f39200",
             },
-            fontFamily: {
-              display: ["Cinzel", "Georgia", "serif"],
-              serif: ["Cormorant Garamond", "Georgia", "serif"],
-              sans: ["Outfit", "system-ui", "sans-serif"],
-            },
+            fontFamily: { sans: ["Outfit", "system-ui", "sans-serif"] },
           },
         },
       };
     </script>
     <link rel="stylesheet" href="css/extra.css" />
   </head>
-  <body data-page="home" class="font-sans text-stone-100 antialiased">
-    <div id="firebase-banner" class="hidden bg-amber-500/15 border-b border-amber-500/30 text-amber-100 text-sm px-4 py-3 text-center">
-      Configure o Firebase em <code class="text-gold">js/firebase-config.js</code> para ativar cadastros e votos.
+  <body data-page="home" class="font-sans antialiased">
+    <div id="firebase-banner" class="hidden bg-amber-100 text-amber-900 text-sm px-4 py-3 text-center">
+      Configure o Firebase em <code>js/firebase-config.js</code> para ativar cadastros e votos.
     </div>
 
-    <header class="site-header relative z-20">
-      <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-        <a href="index.html" class="flex items-center gap-3">
-          <span class="logo-mark text-lg">B</span>
+    <header class="site-header">
+      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+        <a href="index.html" class="flex items-center gap-3 text-white">
+          <span class="logo-mark">SESI<br />SENAI</span>
           <div>
-            <p class="font-display text-[10px] uppercase tracking-[0.28em] text-gold/80">Evento</p>
-            <p data-event-title class="font-serif text-xl leading-tight">Banca de TCC</p>
+            <p class="text-[11px] uppercase tracking-[0.18em] text-white/70">Umuarama</p>
+            <p class="font-semibold leading-tight">Portal de eventos</p>
           </div>
         </a>
-        <nav class="flex flex-wrap items-center justify-end gap-1">
-          <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="#evento">Detalhes</a>
-          <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="#projetos">Projetos</a>
-          <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="cadastrar.html">Cadastrar</a>
-          <a class="nav-link px-3 py-2 text-gold" href="admin.html">Professor</a>
+        <nav class="flex items-center gap-1">
+          <a class="nav-link is-active px-3 py-2" href="index.html">Eventos</a>
+          <a class="nav-link px-3 py-2" href="admin.html">Área interna</a>
         </nav>
       </div>
     </header>
 
-    <section class="event-banner" aria-label="Banner da apresentação de TCC">
-      <img
-        class="event-banner-img"
-        src="uploads/banner.png"
-        alt="SENAI e SESI — Apresentação de TCC, Trabalho de Conclusão de Curso, Desenvolvimento de Sistemas. Ideias que viram código. Soluções que transformam o futuro."
-      />
-      <div class="event-banner-bar">
-        <a href="#projetos" class="btn-gold px-6 py-3">Ver projetos</a>
-        <a href="cadastrar.html" class="btn-ghost px-6 py-3">Cadastrar projeto</a>
-      </div>
+    <section class="hero-banner" aria-label="Banner SESI SENAI">
+      <img src="uploads/banner.png" alt="SESI SENAI — Apresentação de TCC, Desenvolvimento de Sistemas, Umuarama" />
     </section>
 
-    <main>
-      <section id="evento" class="max-w-5xl mx-auto px-4 py-16">
-        <p class="section-title mb-3">O evento</p>
-        <h2 class="font-serif text-4xl mb-8">Detalhes da banca</h2>
+    <main class="max-w-6xl mx-auto px-4 py-14">
+      <p class="kicker mb-3">SESI SENAI Umuarama</p>
+      <h1 class="text-4xl md:text-5xl font-semibold mb-3">Eventos</h1>
+      <p class="text-slate-600 max-w-2xl mb-10">
+        Confira as bancas, concursos e apresentações. Entre no evento para ver os projetos ou trabalhos inscritos e participar da votação.
+      </p>
 
-        <div class="panel p-8 md:p-10">
-          <p data-event-description class="text-stone-300 leading-relaxed text-lg">
-            Cadastre o projeto da equipe, acompanhe a ordem das apresentações e avalie os trabalhos da turma.
-          </p>
-
-          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-10">
-            <div data-requires="date" class="fact hidden">
-              <p class="section-title mb-2">Data</p>
-              <p data-event-date class="font-serif text-2xl"></p>
-            </div>
-            <div data-requires="time" class="fact hidden">
-              <p class="section-title mb-2">Horário</p>
-              <p data-event-time class="font-serif text-2xl"></p>
-            </div>
-            <div data-requires="location" class="fact hidden">
-              <p class="section-title mb-2">Local</p>
-              <p data-event-location class="font-serif text-2xl"></p>
-            </div>
-            <div data-requires="className" class="fact hidden">
-              <p class="section-title mb-2">Turma</p>
-              <p data-event-class class="font-serif text-2xl"></p>
-            </div>
-          </div>
-
-          <p id="event-facts-empty" class="hidden text-sm text-stone-500 mt-8">
-            O professor ainda não preencheu data, horário, local ou turma. Isso é feito na área do professor.
-          </p>
-        </div>
-      </section>
-
-      <section id="projetos" class="max-w-5xl mx-auto px-4 pb-20">
-        <div class="flex flex-wrap items-end justify-between gap-4 mb-8">
-          <div>
-            <p class="section-title mb-3">Programação</p>
-            <h2 class="font-serif text-4xl">Projetos do evento</h2>
-          </div>
-          <p id="order-status" class="text-sm text-stone-400"></p>
-        </div>
-
-        <div id="projetos-loading" class="text-stone-400">Carregando projetos…</div>
-        <div id="projetos-empty" class="hidden panel p-10 text-center text-stone-400">
-          Nenhum projeto cadastrado neste evento.
-          <a class="text-gold hover:underline ml-1" href="cadastrar.html">Cadastrar o primeiro</a>.
-        </div>
-        <div id="projetos-grid" class="grid md:grid-cols-2 gap-5"></div>
-      </section>
+      <div id="events-loading" class="text-slate-500">Carregando eventos…</div>
+      <div id="events-empty" class="hidden panel p-10 text-center text-slate-500">
+        Nenhum evento cadastrado ainda. A área interna do professor cria os eventos.
+      </div>
+      <div id="events-grid" class="grid md:grid-cols-2 gap-5"></div>
     </main>
 
-    <footer class="site-footer py-8 text-center text-sm text-stone-500">
-      <span data-event-title>Banca de TCC</span> · projetos da turma
+    <footer class="site-footer py-8 text-center text-sm">
+      SESI SENAI Umuarama · portal de eventos
     </footer>
 
     <div id="toast-root" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
-    <div class="hidden student-name remove-student tracking-[0.22em] items-start text-3xl mb-2 mb-4 pt-1 text-[10px] text-gold/80 font-display line-clamp-3"></div>
+    <div class="hidden p-4 p-5 p-6 mb-2 mb-3 mb-4 mt-4 text-2xl text-xl text-sm text-xs font-semibold font-medium flex items-start justify-between gap-3 gap-4 text-slate-400 text-slate-500 text-slate-600 text-blue hover:underline border border-slate-200 px-4 py-4 line-clamp-3 uppercase tracking-wide"></div>
     <script type="module" src="js/home.js"></script>
   </body>
 </html>

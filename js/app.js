@@ -3,9 +3,15 @@ import {
   getFirestore,
   doc,
   getDoc,
+  collection,
+  getDocs,
+  query,
+  where,
 } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 import { firebaseConfig, isFirebaseConfigured } from "./firebase-config.js";
+
+export const SITE_NAME = "SESI SENAI Umuarama";
 
 export const CRITERIA = [
   { id: "clareza", label: "Clareza" },
@@ -14,34 +20,45 @@ export const CRITERIA = [
   { id: "dominio", label: "Domínio do conteúdo" },
 ];
 
-export const DEFAULT_EVENT_TITLE = "Banca de TCC";
-
-export const EVENT_DEFAULTS = {
-  title: DEFAULT_EVENT_TITLE,
-  eyebrow: "Apresentação comercial de TCC",
-  subtitle: "Simulação de banca para as equipes formandas",
-  description:
-    "Cadastre o projeto da equipe, acompanhe a ordem das apresentações e avalie os trabalhos da turma.",
-  date: "",
-  time: "",
-  location: "",
-  className: "",
-  votingOpen: false,
-  orderDrawnAt: null,
+export const EVENT_TYPES = {
+  projetos: {
+    id: "projetos",
+    label: "Projetos",
+    singular: "projeto",
+    plural: "projetos",
+    register: "Cadastrar projeto",
+    vote: "Avaliar projeto",
+    empty: "Nenhum projeto cadastrado neste evento.",
+  },
+  concurso: {
+    id: "concurso",
+    label: "Concurso",
+    singular: "trabalho",
+    plural: "trabalhos",
+    register: "Inscrever trabalho",
+    vote: "Votar no trabalho",
+    empty: "Nenhum trabalho inscrito neste concurso.",
+  },
 };
 
-export function normalizeEventConfig(data = {}) {
+export function eventType(type) {
+  return EVENT_TYPES[type] || EVENT_TYPES.projetos;
+}
+
+export function normalizeEvent(id, data = {}) {
+  const type = EVENT_TYPES[data.type] ? data.type : "projetos";
   return {
-    title: data.title || EVENT_DEFAULTS.title,
-    eyebrow: data.eyebrow || EVENT_DEFAULTS.eyebrow,
-    subtitle: data.subtitle || EVENT_DEFAULTS.subtitle,
-    description: data.description || EVENT_DEFAULTS.description,
+    id,
+    title: data.title || "Evento",
+    type,
+    description: data.description || "",
     date: data.date || "",
     time: data.time || "",
     location: data.location || "",
     className: data.className || "",
     votingOpen: Boolean(data.votingOpen),
     orderDrawnAt: data.orderDrawnAt || null,
+    createdAt: data.createdAt || null,
   };
 }
 
@@ -62,24 +79,40 @@ export function formatEventTime(value) {
   return value.length === 5 ? `${value}h` : value;
 }
 
+export function eventFacts(event) {
+  return [
+    event.date ? { label: "Data", value: formatEventDate(event.date) } : null,
+    event.time ? { label: "Horário", value: formatEventTime(event.time) } : null,
+    event.location ? { label: "Local", value: event.location } : null,
+    event.className ? { label: "Turma", value: event.className } : null,
+  ].filter(Boolean);
+}
+
 export function sortProjects(projects) {
   const drawn = projects.every((p) => typeof p.order === "number" && p.order > 0);
   if (drawn) return [...projects].sort((a, b) => a.order - b.order);
   return [...projects].sort((a, b) => (a.title || "").localeCompare(b.title || "", "pt-BR"));
 }
 
-export function projectCardHtml(project) {
+export function formatOrder(order) {
+  if (!order) return "";
+  return `${order}º a apresentar`;
+}
+
+export function projectCardHtml(project, event) {
+  const type = eventType(event?.type);
   const orderLabel = formatOrder(project.order);
   const index = project.order ? String(project.order).padStart(2, "0") : "—";
   return `
-    <a href="projeto.html?id=${encodeURIComponent(project.id)}" class="card-glow panel program-card">
-      <div class="flex items-start justify-between gap-4 mb-4">
-        <p class="program-index">${escapeHtml(index)}</p>
-        ${orderLabel ? `<p class="font-display text-[10px] uppercase tracking-[0.22em] text-gold/80 pt-1">${escapeHtml(orderLabel)}</p>` : ""}
+    <a href="projeto.html?id=${encodeURIComponent(project.id)}" class="card-link panel p-6">
+      <div class="flex items-start justify-between gap-4 mb-3">
+        <p class="text-blue font-semibold">${escapeHtml(index)}</p>
+        ${orderLabel ? `<p class="text-xs uppercase tracking-wide text-slate-500">${escapeHtml(orderLabel)}</p>` : ""}
       </div>
-      <h2 class="font-serif text-3xl mb-2">${escapeHtml(project.title)}</h2>
-      <p class="text-sm text-stone-400 mb-4">${escapeHtml((project.students || []).join(" · "))}</p>
-      <p class="text-stone-500 text-sm line-clamp-3">${escapeHtml(project.description)}</p>
+      <h3 class="text-xl font-semibold mb-2">${escapeHtml(project.title)}</h3>
+      <p class="text-sm text-slate-500 mb-3">${escapeHtml((project.students || []).join(" · "))}</p>
+      <p class="text-slate-600 text-sm line-clamp-3">${escapeHtml(project.description)}</p>
+      <p class="text-blue text-sm font-medium mt-4">${escapeHtml(type.vote)} →</p>
     </a>
   `;
 }
@@ -125,11 +158,6 @@ export function shuffle(items) {
   return copy;
 }
 
-export function formatOrder(order) {
-  if (!order) return "";
-  return `${order}º a apresentar`;
-}
-
 export function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -143,11 +171,7 @@ export function showToast(message, type = "ok") {
   const root = document.getElementById("toast-root");
   if (!root) return;
   const el = document.createElement("div");
-  const tone =
-    type === "error"
-      ? "border-red-400/30 bg-red-950/80 text-red-100"
-      : "border-gold/30 bg-navy-800 text-stone-100";
-  el.className = `toast-enter max-w-sm rounded-xl border px-4 py-3 text-sm shadow-xl ${tone}`;
+  el.className = `toast-enter max-w-sm px-4 py-3 text-sm shadow-lg ${type === "error" ? "toast-error" : "toast-ok"}`;
   el.textContent = message;
   root.appendChild(el);
   setTimeout(() => el.remove(), 4200);
@@ -162,67 +186,46 @@ export function round1(n) {
   return Math.round(n * 10) / 10;
 }
 
-export async function loadEventConfig() {
+export async function loadEvents() {
   const firebase = getFirebase();
-  if (!firebase) return normalizeEventConfig();
-  const snap = await getDoc(doc(firebase.db, "config", "event"));
-  if (!snap.exists()) return normalizeEventConfig();
-  return normalizeEventConfig(snap.data());
+  if (!firebase) return [];
+  const snap = await getDocs(collection(firebase.db, "events"));
+  return snap.docs
+    .map((item) => normalizeEvent(item.id, item.data()))
+    .sort((a, b) => (b.date || "").localeCompare(a.date || "") || a.title.localeCompare(b.title, "pt-BR"));
 }
 
-export function applyEventTitle(title) {
-  document.querySelectorAll("[data-event-title]").forEach((el) => {
-    el.textContent = title || DEFAULT_EVENT_TITLE;
-  });
+export async function loadEvent(eventId) {
+  const firebase = getFirebase();
+  if (!firebase || !eventId) return null;
+  const snap = await getDoc(doc(firebase.db, "events", eventId));
+  if (!snap.exists()) return null;
+  return normalizeEvent(snap.id, snap.data());
 }
 
-export function applyEventConfig(config) {
-  const event = normalizeEventConfig(config);
-  applyEventTitle(event.title);
+export async function loadEventProjects(eventId) {
+  const firebase = getFirebase();
+  if (!firebase || !eventId) return [];
+  const snap = await getDocs(query(collection(firebase.db, "projects"), where("eventId", "==", eventId)));
+  return snap.docs.map((item) => ({ id: item.id, ...item.data() }));
+}
 
-  const map = {
-    "[data-event-eyebrow]": event.eyebrow,
-    "[data-event-subtitle]": event.subtitle,
-    "[data-event-description]": event.description,
-    "[data-event-date]": formatEventDate(event.date),
-    "[data-event-time]": formatEventTime(event.time),
-    "[data-event-location]": event.location,
-    "[data-event-class]": event.className,
-  };
-
-  Object.entries(map).forEach(([selector, value]) => {
-    document.querySelectorAll(selector).forEach((el) => {
-      el.textContent = value;
-    });
-  });
-
-  document.querySelectorAll("[data-requires]").forEach((el) => {
-    const key = el.dataset.requires;
-    const value = event[key];
-    el.classList.toggle("hidden", !value);
-  });
-
-  if (document.body?.dataset.page === "home") {
-    document.title = `${event.title} — Apresentações`;
-  }
+export function eventCardHtml(event) {
+  const type = eventType(event.type);
+  const date = formatEventDate(event.date) || "Data a definir";
+  return `
+    <a href="evento.html?id=${encodeURIComponent(event.id)}" class="card-link panel p-6">
+      <span class="badge mb-4">${escapeHtml(type.label)}</span>
+      <h2 class="text-2xl font-semibold mb-2">${escapeHtml(event.title)}</h2>
+      <p class="text-sm text-slate-500 mb-3">${escapeHtml(date)}${event.location ? ` · ${escapeHtml(event.location)}` : ""}</p>
+      <p class="text-slate-600 text-sm line-clamp-3">${escapeHtml(event.description || "Abra para ver os detalhes e as inscrições.")}</p>
+    </a>
+  `;
 }
 
 export async function bootPage() {
   const banner = document.getElementById("firebase-banner");
   if (!isFirebaseConfigured() && banner) banner.classList.remove("hidden");
-
-  try {
-    const config = await loadEventConfig();
-    applyEventConfig(config);
-    return config;
-  } catch (error) {
-    console.error(error);
-    applyEventConfig(EVENT_DEFAULTS);
-    if (isFirebaseConfigured()) {
-      showToast("Não foi possível conectar ao Firebase. Confira as chaves e as regras.", "error");
-    }
-    return normalizeEventConfig();
-  }
 }
 
 bootPage();

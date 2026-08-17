@@ -3,6 +3,8 @@ import {
   doc,
   getDoc,
   getDocs,
+  query,
+  where,
   setDoc,
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
@@ -11,7 +13,8 @@ import {
   isFirebaseConfigured,
   escapeHtml,
   formatOrder,
-  loadEventConfig,
+  loadEvent,
+  eventType,
   CRITERIA,
   average,
   round1,
@@ -42,6 +45,7 @@ const votePreview = document.getElementById("vote-preview");
 const voterSelect = document.getElementById("voter-name");
 
 let currentProject = null;
+let currentEvent = null;
 
 function hideVotePanels() {
   [formIdent, formVoto, voteClosed, voteOwn, voteDone].forEach((el) => el.classList.add("hidden"));
@@ -64,7 +68,7 @@ function renderCriteria() {
       <label class="block">
         <div class="flex items-center justify-between text-sm mb-2">
           <span>${escapeHtml(item.label)}</span>
-          <span data-val="${item.id}" class="text-gold font-medium">5</span>
+          <span data-val="${item.id}" class="text-blue font-medium">5</span>
         </div>
         <input type="range" min="0" max="10" step="1" value="5" data-criteria="${item.id}" />
       </label>
@@ -89,14 +93,12 @@ function currentScores() {
 }
 
 function updatePreview() {
-  const scores = currentScores();
-  votePreview.textContent = round1(average(Object.values(scores))).toFixed(1);
+  votePreview.textContent = round1(average(Object.values(currentScores()))).toFixed(1);
 }
 
-async function showVoteUi(config) {
+async function showVoteUi() {
   hideVotePanels();
-
-  if (!config.votingOpen) {
+  if (!currentEvent?.votingOpen) {
     voteClosed.classList.remove("hidden");
     return;
   }
@@ -106,12 +108,10 @@ async function showVoteUi(config) {
     formIdent.classList.remove("hidden");
     return;
   }
-
   if (isTeamMember(currentProject, session.name)) {
     voteOwn.classList.remove("hidden");
     return;
   }
-
   if (await hasVoted(session.voterId, currentProject.id)) {
     voteDone.classList.remove("hidden");
     return;
@@ -129,17 +129,12 @@ async function loadPage() {
     return;
   }
   if (!isFirebaseConfigured()) {
-    loading.textContent = "Configure o Firebase para abrir o projeto.";
+    loading.textContent = "Configure o Firebase para abrir a inscrição.";
     return;
   }
 
   const firebase = getFirebase();
-  const [config, projectSnap, projectsSnap] = await Promise.all([
-    loadEventConfig(),
-    getDoc(doc(firebase.db, "projects", projectId)),
-    getDocs(collection(firebase.db, "projects")),
-  ]);
-
+  const projectSnap = await getDoc(doc(firebase.db, "projects", projectId));
   loading.classList.add("hidden");
   if (!projectSnap.exists()) {
     missing.classList.remove("hidden");
@@ -147,32 +142,38 @@ async function loadPage() {
   }
 
   currentProject = { id: projectSnap.id, ...projectSnap.data() };
-  document.title = `${currentProject.title} — Banca de TCC`;
+  currentEvent = await loadEvent(currentProject.eventId);
+  const type = eventType(currentEvent?.type);
+
+  document.title = `${currentProject.title} — SESI SENAI Umuarama`;
   document.getElementById("projeto-order").textContent = formatOrder(currentProject.order);
   document.getElementById("projeto-title").textContent = currentProject.title;
   document.getElementById("projeto-students").textContent = (currentProject.students || []).join(" · ");
   document.getElementById("projeto-description").textContent = currentProject.description;
+  document.getElementById("vote-title").textContent = type.vote;
+  if (currentEvent) {
+    document.getElementById("back-evento").href = `evento.html?id=${encodeURIComponent(currentEvent.id)}`;
+  }
   content.classList.remove("hidden");
 
-  const names = uniqueStudentNames(projectsSnap.docs.map((d) => d.data()));
-  names.forEach((name) => {
+  const eventProjects = currentProject.eventId
+    ? (await getDocs(query(collection(firebase.db, "projects"), where("eventId", "==", currentProject.eventId)))).docs.map((d) => d.data())
+    : [];
+  uniqueStudentNames(eventProjects).forEach((name) => {
     const option = document.createElement("option");
     option.value = name;
     option.textContent = name;
     voterSelect.appendChild(option);
   });
 
-  await showVoteUi(config);
+  await showVoteUi();
 }
 
 formIdent.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const name = voterSelect.value;
-  const pin = document.getElementById("voter-pin").value.trim();
   try {
-    await identifyStudent(name, pin);
-    const config = await loadEventConfig();
-    await showVoteUi(config);
+    await identifyStudent(voterSelect.value, document.getElementById("voter-pin").value.trim());
+    await showVoteUi();
   } catch (error) {
     console.error(error);
     showToast(error.message || "Não foi possível identificar o aluno.", "error");
@@ -183,14 +184,14 @@ formVoto.addEventListener("submit", async (event) => {
   event.preventDefault();
   const session = getStudentSession();
   const firebase = getFirebase();
-  if (!session || !firebase) return;
+  if (!session || !firebase || !currentEvent) return;
 
   if (isTeamMember(currentProject, session.name)) {
-    showToast("Você não pode votar no próprio projeto.", "error");
+    showToast("Você não pode votar na própria inscrição.", "error");
     return;
   }
   if (await hasVoted(session.voterId, currentProject.id)) {
-    showToast("Você já votou neste projeto.", "error");
+    showToast("Você já votou nesta inscrição.", "error");
     hideVotePanels();
     voteDone.classList.remove("hidden");
     return;
@@ -198,13 +199,13 @@ formVoto.addEventListener("submit", async (event) => {
 
   const scores = currentScores();
   const avg = round1(average(Object.values(scores)));
-  const voteId = `${session.voterId}_${currentProject.id}`;
   const submitBtn = document.getElementById("submit-voto");
   submitBtn.disabled = true;
 
   try {
-    await setDoc(doc(firebase.db, "votes", voteId), {
+    await setDoc(doc(firebase.db, "votes", `${session.voterId}_${currentProject.id}`), {
       projectId: currentProject.id,
+      eventId: currentEvent.id,
       voterId: session.voterId,
       voterName: session.name,
       criteria: scores,
@@ -223,11 +224,10 @@ formVoto.addEventListener("submit", async (event) => {
 
 document.getElementById("logout-aluno").addEventListener("click", async () => {
   clearStudentSession();
-  const config = await loadEventConfig();
-  await showVoteUi(config);
+  await showVoteUi();
 });
 
 loadPage().catch((error) => {
   console.error(error);
-  loading.textContent = "Não foi possível carregar este projeto.";
+  loading.textContent = "Não foi possível carregar esta inscrição.";
 });
