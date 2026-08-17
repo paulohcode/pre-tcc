@@ -71,9 +71,14 @@ form.addEventListener("submit", async (event) => {
   }
 
   const firebase = getFirebase();
+  if (!firebase) {
+    showToast("Firebase não inicializou. Recarregue a página.", "error");
+    return;
+  }
+
   const title = document.getElementById("title").value.trim();
   const description = document.getElementById("description").value.trim();
-  const students = [...document.querySelectorAll(".student-name")]
+  const students = [...list.querySelectorAll("input.student-name")]
     .map((input) => input.value.trim())
     .filter(Boolean);
 
