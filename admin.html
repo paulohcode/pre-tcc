@@ -47,7 +47,7 @@
           </div>
         </a>
         <nav class="flex flex-wrap items-center justify-end gap-1">
-          <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="projetos.html">Projetos</a>
+          <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="index.html#projetos">Projetos</a>
           <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="cadastrar.html">Cadastrar</a>
           <a class="nav-link is-active px-3 py-2 text-gold" href="admin.html">Professor</a>
         </nav>
@@ -56,7 +56,7 @@
 
     <main class="max-w-6xl mx-auto px-4 py-12">
       <section id="admin-login" class="max-w-md mx-auto">
-        <p class="font-display text-[11px] uppercase tracking-[0.35em] text-gold mb-2">Acesso restrito</p>
+        <p class="section-title mb-2">Acesso restrito</p>
         <h1 class="font-serif text-5xl mb-3">Área do professor</h1>
         <p class="ornament ornament-sm mb-6">✦</p>
         <p class="text-stone-400 mb-8">Use o e-mail e a senha criados no Firebase Authentication.</p>
@@ -78,20 +78,56 @@
       <section id="admin-panel" class="hidden space-y-8">
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p class="font-display text-[11px] uppercase tracking-[0.35em] text-gold mb-2">Painel</p>
+            <p class="section-title mb-2">Painel</p>
             <h1 class="font-serif text-5xl">Controle da banca</h1>
           </div>
           <button id="admin-logout" class="text-sm text-stone-400 hover:text-white">Sair</button>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-5">
-          <div class="panel p-6">
-            <h2 class="font-serif text-2xl mb-2">Nome do evento</h2>
-            <form id="form-event-title" class="space-y-3">
-              <input id="event-title-input" maxlength="80" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" />
-              <button type="submit" class="text-sm text-gold hover:text-gold-light">Salvar nome</button>
-            </form>
+        <form id="form-evento" class="panel p-6 md:p-8 space-y-6">
+          <div>
+            <p class="section-title mb-2">Cadastro do evento</p>
+            <h2 class="font-serif text-3xl">Dados que aparecem na home</h2>
+            <p class="text-sm text-stone-400 mt-2">Banner, detalhes e a lista de projetos usam estas informações.</p>
           </div>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="md:col-span-2">
+              <label for="event-title-input" class="block text-sm mb-2 text-stone-300">Nome do evento</label>
+              <input id="event-title-input" maxlength="80" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" />
+            </div>
+            <div>
+              <label for="event-eyebrow-input" class="block text-sm mb-2 text-stone-300">Linha do banner</label>
+              <input id="event-eyebrow-input" maxlength="80" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" placeholder="Ex.: Apresentação comercial de TCC" />
+            </div>
+            <div>
+              <label for="event-subtitle-input" class="block text-sm mb-2 text-stone-300">Subtítulo</label>
+              <input id="event-subtitle-input" maxlength="140" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" />
+            </div>
+            <div>
+              <label for="event-date-input" class="block text-sm mb-2 text-stone-300">Data</label>
+              <input id="event-date-input" type="date" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" />
+            </div>
+            <div>
+              <label for="event-time-input" class="block text-sm mb-2 text-stone-300">Horário</label>
+              <input id="event-time-input" type="time" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" />
+            </div>
+            <div>
+              <label for="event-location-input" class="block text-sm mb-2 text-stone-300">Local</label>
+              <input id="event-location-input" maxlength="80" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" placeholder="Ex.: Auditório" />
+            </div>
+            <div>
+              <label for="event-class-input" class="block text-sm mb-2 text-stone-300">Turma</label>
+              <input id="event-class-input" maxlength="80" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50" placeholder="Ex.: 3º ano — Desenvolvimento de Sistemas" />
+            </div>
+            <div class="md:col-span-2">
+              <label for="event-description-input" class="block text-sm mb-2 text-stone-300">Descrição</label>
+              <textarea id="event-description-input" rows="4" maxlength="1000" class="w-full bg-navy-950 border border-gold/20 px-4 py-3 outline-none focus:border-gold/50 resize-y"></textarea>
+            </div>
+          </div>
+          <button type="submit" class="btn-gold px-6 py-3">Salvar evento</button>
+        </form>
+
+        <div class="grid md:grid-cols-2 gap-5">
           <div class="panel p-6">
             <h2 class="font-serif text-2xl mb-2">Ordem das apresentações</h2>
             <p id="draw-status" class="text-sm text-stone-400 mb-4">Ainda não sorteada.</p>

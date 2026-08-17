@@ -101,7 +101,7 @@ form.addEventListener("submit", async (event) => {
       createdAt: serverTimestamp(),
     });
     showToast("Projeto cadastrado.");
-    window.location.href = "projetos.html";
+    window.location.href = "index.html#projetos";
   } catch (error) {
     console.error(error);
     showToast("Não foi possível cadastrar. Confira as regras do Firestore.", "error");

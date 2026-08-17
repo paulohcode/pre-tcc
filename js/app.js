@@ -16,6 +16,74 @@ export const CRITERIA = [
 
 export const DEFAULT_EVENT_TITLE = "Banca de TCC";
 
+export const EVENT_DEFAULTS = {
+  title: DEFAULT_EVENT_TITLE,
+  eyebrow: "Apresentação comercial de TCC",
+  subtitle: "Simulação de banca para as equipes formandas",
+  description:
+    "Cadastre o projeto da equipe, acompanhe a ordem das apresentações e avalie os trabalhos da turma.",
+  date: "",
+  time: "",
+  location: "",
+  className: "",
+  votingOpen: false,
+  orderDrawnAt: null,
+};
+
+export function normalizeEventConfig(data = {}) {
+  return {
+    title: data.title || EVENT_DEFAULTS.title,
+    eyebrow: data.eyebrow || EVENT_DEFAULTS.eyebrow,
+    subtitle: data.subtitle || EVENT_DEFAULTS.subtitle,
+    description: data.description || EVENT_DEFAULTS.description,
+    date: data.date || "",
+    time: data.time || "",
+    location: data.location || "",
+    className: data.className || "",
+    votingOpen: Boolean(data.votingOpen),
+    orderDrawnAt: data.orderDrawnAt || null,
+  };
+}
+
+export function formatEventDate(iso) {
+  if (!iso) return "";
+  const [year, month, day] = String(iso).split("-").map(Number);
+  if (!year || !month || !day) return iso;
+  return new Date(year, month - 1, day).toLocaleDateString("pt-BR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+export function formatEventTime(value) {
+  if (!value) return "";
+  return value.length === 5 ? `${value}h` : value;
+}
+
+export function sortProjects(projects) {
+  const drawn = projects.every((p) => typeof p.order === "number" && p.order > 0);
+  if (drawn) return [...projects].sort((a, b) => a.order - b.order);
+  return [...projects].sort((a, b) => (a.title || "").localeCompare(b.title || "", "pt-BR"));
+}
+
+export function projectCardHtml(project) {
+  const orderLabel = formatOrder(project.order);
+  const index = project.order ? String(project.order).padStart(2, "0") : "—";
+  return `
+    <a href="projeto.html?id=${encodeURIComponent(project.id)}" class="card-glow panel program-card">
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <p class="program-index">${escapeHtml(index)}</p>
+        ${orderLabel ? `<p class="font-display text-[10px] uppercase tracking-[0.22em] text-gold/80 pt-1">${escapeHtml(orderLabel)}</p>` : ""}
+      </div>
+      <h2 class="font-serif text-3xl mb-2">${escapeHtml(project.title)}</h2>
+      <p class="text-sm text-stone-400 mb-4">${escapeHtml((project.students || []).join(" · "))}</p>
+      <p class="text-stone-500 text-sm line-clamp-3">${escapeHtml(project.description)}</p>
+    </a>
+  `;
+}
+
 let app;
 let db;
 let auth;
@@ -96,19 +164,10 @@ export function round1(n) {
 
 export async function loadEventConfig() {
   const firebase = getFirebase();
-  if (!firebase) {
-    return { title: DEFAULT_EVENT_TITLE, votingOpen: false, orderDrawnAt: null };
-  }
+  if (!firebase) return normalizeEventConfig();
   const snap = await getDoc(doc(firebase.db, "config", "event"));
-  if (!snap.exists()) {
-    return { title: DEFAULT_EVENT_TITLE, votingOpen: false, orderDrawnAt: null };
-  }
-  const data = snap.data();
-  return {
-    title: data.title || DEFAULT_EVENT_TITLE,
-    votingOpen: Boolean(data.votingOpen),
-    orderDrawnAt: data.orderDrawnAt || null,
-  };
+  if (!snap.exists()) return normalizeEventConfig();
+  return normalizeEventConfig(snap.data());
 }
 
 export function applyEventTitle(title) {
@@ -117,21 +176,52 @@ export function applyEventTitle(title) {
   });
 }
 
+export function applyEventConfig(config) {
+  const event = normalizeEventConfig(config);
+  applyEventTitle(event.title);
+
+  const map = {
+    "[data-event-eyebrow]": event.eyebrow,
+    "[data-event-subtitle]": event.subtitle,
+    "[data-event-description]": event.description,
+    "[data-event-date]": formatEventDate(event.date),
+    "[data-event-time]": formatEventTime(event.time),
+    "[data-event-location]": event.location,
+    "[data-event-class]": event.className,
+  };
+
+  Object.entries(map).forEach(([selector, value]) => {
+    document.querySelectorAll(selector).forEach((el) => {
+      el.textContent = value;
+    });
+  });
+
+  document.querySelectorAll("[data-requires]").forEach((el) => {
+    const key = el.dataset.requires;
+    const value = event[key];
+    el.classList.toggle("hidden", !value);
+  });
+
+  if (document.body?.dataset.page === "home") {
+    document.title = `${event.title} — Apresentações`;
+  }
+}
+
 export async function bootPage() {
   const banner = document.getElementById("firebase-banner");
   if (!isFirebaseConfigured() && banner) banner.classList.remove("hidden");
 
   try {
     const config = await loadEventConfig();
-    applyEventTitle(config.title);
+    applyEventConfig(config);
     return config;
   } catch (error) {
     console.error(error);
-    applyEventTitle(DEFAULT_EVENT_TITLE);
+    applyEventConfig(EVENT_DEFAULTS);
     if (isFirebaseConfigured()) {
       showToast("Não foi possível conectar ao Firebase. Confira as chaves e as regras.", "error");
     }
-    return { title: DEFAULT_EVENT_TITLE, votingOpen: false, orderDrawnAt: null };
+    return normalizeEventConfig();
   }
 }
 

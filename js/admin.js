@@ -49,9 +49,7 @@ function requireFirebase() {
 async function ensureEventConfig(db, patch = {}) {
   const current = await loadEventConfig();
   const next = {
-    title: current.title || DEFAULT_EVENT_TITLE,
-    votingOpen: Boolean(current.votingOpen),
-    orderDrawnAt: current.orderDrawnAt || null,
+    ...current,
     ...patch,
   };
   await setDoc(doc(db, "config", "event"), next, { merge: true });
@@ -61,6 +59,13 @@ async function ensureEventConfig(db, patch = {}) {
 
 function renderStatus(config) {
   document.getElementById("event-title-input").value = config.title || DEFAULT_EVENT_TITLE;
+  document.getElementById("event-eyebrow-input").value = config.eyebrow || "";
+  document.getElementById("event-subtitle-input").value = config.subtitle || "";
+  document.getElementById("event-description-input").value = config.description || "";
+  document.getElementById("event-date-input").value = config.date || "";
+  document.getElementById("event-time-input").value = config.time || "";
+  document.getElementById("event-location-input").value = config.location || "";
+  document.getElementById("event-class-input").value = config.className || "";
   document.getElementById("draw-status").textContent = config.orderDrawnAt
     ? "Ordem já sorteada. Você pode sortear de novo se precisar."
     : "Ainda não sorteada.";
@@ -289,12 +294,20 @@ document.getElementById("admin-logout").addEventListener("click", async () => {
   if (firebase) await signOut(firebase.auth);
 });
 
-document.getElementById("form-event-title").addEventListener("submit", async (event) => {
+document.getElementById("form-evento").addEventListener("submit", async (event) => {
   event.preventDefault();
   const firebase = getFirebase();
-  const title = document.getElementById("event-title-input").value.trim() || DEFAULT_EVENT_TITLE;
-  await ensureEventConfig(firebase.db, { title });
-  showToast("Nome do evento salvo.");
+  await ensureEventConfig(firebase.db, {
+    title: document.getElementById("event-title-input").value.trim() || DEFAULT_EVENT_TITLE,
+    eyebrow: document.getElementById("event-eyebrow-input").value.trim(),
+    subtitle: document.getElementById("event-subtitle-input").value.trim(),
+    description: document.getElementById("event-description-input").value.trim(),
+    date: document.getElementById("event-date-input").value,
+    time: document.getElementById("event-time-input").value,
+    location: document.getElementById("event-location-input").value.trim(),
+    className: document.getElementById("event-class-input").value.trim(),
+  });
+  showToast("Dados do evento salvos. Eles aparecem na página inicial.");
 });
 
 document.getElementById("btn-sortear").addEventListener("click", async () => {

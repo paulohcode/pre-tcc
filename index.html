@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Banca de TCC — Apresentação comercial</title>
+    <title>Banca de TCC</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,7 +17,7 @@
         theme: {
           extend: {
             colors: {
-              navy: { 950: "#05060c", 900: "#0a0d16", 800: "#12182a", 700: "#1c2740", 600: "#243250" },
+              navy: { 950: "#070b14", 900: "#0c1222", 800: "#141c2e", 700: "#1c2740", 600: "#243250" },
               gold: { DEFAULT: "#c9a56a", dim: "#a98442", light: "#f0e1b8" },
             },
             fontFamily: {
@@ -32,194 +32,99 @@
     <link rel="stylesheet" href="css/extra.css" />
   </head>
   <body data-page="home" class="font-sans text-stone-100 antialiased">
-    <div id="firebase-banner" class="hidden bg-amber-500/15 border-b border-amber-500/30 text-amber-100 text-sm px-4 py-3 text-center relative z-30">
-      Configure o Firebase em <code class="text-gold">js/firebase-config.js</code> para ativar cadastros e votos. Veja o README.
+    <div id="firebase-banner" class="hidden bg-amber-500/15 border-b border-amber-500/30 text-amber-100 text-sm px-4 py-3 text-center">
+      Configure o Firebase em <code class="text-gold">js/firebase-config.js</code> para ativar cadastros e votos.
     </div>
 
-    <main>
-      <section class="hero-stage">
-        <div class="stage-lights"></div>
-        <div class="spotlight spotlight-left"></div>
-        <div class="spotlight spotlight-right"></div>
-        <div class="dust"></div>
-        <div class="stage-curtain"></div>
-        <div class="audience"></div>
-
-        <header class="site-header home-header z-20">
-          <div class="header-rail"></div>
-          <div class="max-w-6xl mx-auto px-4 py-5 flex items-center justify-between gap-4">
-            <a href="index.html" class="flex items-center gap-3">
-              <span class="logo-mark text-lg">B</span>
-              <div>
-                <p class="font-display text-[10px] uppercase tracking-[0.32em] text-gold/80">Evento acadêmico</p>
-                <p data-event-title class="font-serif text-xl leading-tight">Banca de TCC</p>
-              </div>
-            </a>
-            <nav class="flex flex-wrap items-center justify-end gap-1">
-              <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="projetos.html">Projetos</a>
-              <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="cadastrar.html">Cadastrar</a>
-              <a class="nav-link px-3 py-2 text-gold" href="admin.html">Professor</a>
-            </nav>
-          </div>
-        </header>
-
-        <div class="hero-copy relative z-10 max-w-6xl mx-auto px-4 w-full grid lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-16 items-center">
+    <header class="site-header relative z-20">
+      <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+        <a href="index.html" class="flex items-center gap-3">
+          <span class="logo-mark text-lg">B</span>
           <div>
-            <p class="font-display text-[11px] uppercase tracking-[0.38em] text-gold mb-5">Noite de apresentações</p>
-            <h1 class="font-serif text-5xl md:text-7xl leading-[0.95] max-w-xl">
-              A banca como um <em class="italic gold-text">palco</em>
-            </h1>
-            <p class="ornament mt-6 mb-6">✦</p>
-            <p class="text-stone-300/90 text-lg font-light leading-relaxed max-w-md">
-              Cada equipe sobe com uma apresentação comercial do TCC: problema, solução e domínio — no ritmo de um evento de formandos.
-            </p>
+            <p class="font-display text-[10px] uppercase tracking-[0.28em] text-gold/80">Evento</p>
+            <p data-event-title class="font-serif text-xl leading-tight">Banca de TCC</p>
+          </div>
+        </a>
+        <nav class="flex flex-wrap items-center justify-end gap-1">
+          <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="#evento">Detalhes</a>
+          <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="#projetos">Projetos</a>
+          <a class="nav-link px-3 py-2 text-stone-300 hover:text-white" href="cadastrar.html">Cadastrar</a>
+          <a class="nav-link px-3 py-2 text-gold" href="admin.html">Professor</a>
+        </nav>
+      </div>
+    </header>
 
-            <div class="mt-9 flex flex-wrap gap-3">
-              <a href="cadastrar.html" class="btn-gold px-7 py-3.5">Inscrever equipe</a>
-              <a href="projetos.html" class="btn-ghost px-7 py-3.5">Ver programação</a>
+    <section class="event-banner" aria-label="Banner da apresentação de TCC">
+      <img
+        class="event-banner-img"
+        src="uploads/banner.png"
+        alt="SENAI e SESI — Apresentação de TCC, Trabalho de Conclusão de Curso, Desenvolvimento de Sistemas. Ideias que viram código. Soluções que transformam o futuro."
+      />
+      <div class="event-banner-bar">
+        <a href="#projetos" class="btn-gold px-6 py-3">Ver projetos</a>
+        <a href="cadastrar.html" class="btn-ghost px-6 py-3">Cadastrar projeto</a>
+      </div>
+    </section>
+
+    <main>
+      <section id="evento" class="max-w-5xl mx-auto px-4 py-16">
+        <p class="section-title mb-3">O evento</p>
+        <h2 class="font-serif text-4xl mb-8">Detalhes da banca</h2>
+
+        <div class="panel p-8 md:p-10">
+          <p data-event-description class="text-stone-300 leading-relaxed text-lg">
+            Cadastre o projeto da equipe, acompanhe a ordem das apresentações e avalie os trabalhos da turma.
+          </p>
+
+          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-10">
+            <div data-requires="date" class="fact hidden">
+              <p class="section-title mb-2">Data</p>
+              <p data-event-date class="font-serif text-2xl"></p>
             </div>
-
-            <div class="mt-10 grid grid-cols-3 gap-3 max-w-lg">
-              <div class="ticket px-3 py-4 text-center">
-                <p class="font-display text-[10px] tracking-[0.2em] text-gold/80">FORMATO</p>
-                <p class="font-serif text-xl mt-1">Pitch</p>
-              </div>
-              <div class="ticket px-3 py-4 text-center">
-                <p class="font-display text-[10px] tracking-[0.2em] text-gold/80">ORDEM</p>
-                <p class="font-serif text-xl mt-1">Sorteio</p>
-              </div>
-              <div class="ticket px-3 py-4 text-center">
-                <p class="font-display text-[10px] tracking-[0.2em] text-gold/80">BANCA</p>
-                <p class="font-serif text-xl mt-1">A turma</p>
-              </div>
+            <div data-requires="time" class="fact hidden">
+              <p class="section-title mb-2">Horário</p>
+              <p data-event-time class="font-serif text-2xl"></p>
+            </div>
+            <div data-requires="location" class="fact hidden">
+              <p class="section-title mb-2">Local</p>
+              <p data-event-location class="font-serif text-2xl"></p>
+            </div>
+            <div data-requires="className" class="fact hidden">
+              <p class="section-title mb-2">Turma</p>
+              <p data-event-class class="font-serif text-2xl"></p>
             </div>
           </div>
 
-          <div class="relative">
-            <p class="font-display text-[10px] uppercase tracking-[0.4em] text-gold/70 text-center mb-4">Auditório · tela de projeção</p>
-            <div class="screen-frame">
-              <div class="deck-chrome">
-                <span class="deck-dots" aria-hidden="true"></span>
-                <p class="font-display text-[10px] tracking-[0.28em] uppercase text-gold/80">Pitch comercial · TCC</p>
-                <p id="slide-counter" class="font-display text-[10px] tracking-[0.2em] text-stone-400">01 / 03</p>
-              </div>
-              <div class="relative aspect-[16/10] overflow-hidden">
-              <div class="slide-grid"></div>
-
-              <article data-slide class="slide is-active">
-                <div>
-                  <p class="font-display text-[10px] tracking-[0.35em] text-gold/80">TRABALHO DE CONCLUSÃO DE CURSO</p>
-                  <h2 class="font-serif text-4xl md:text-5xl leading-none mt-4">
-                    Apresentação<br /><span class="italic">comercial</span>
-                  </h2>
-                </div>
-                <div>
-                  <p class="ornament ornament-sm mb-4 text-[9px]">✦</p>
-                  <p data-event-title class="font-display text-sm tracking-[0.22em] uppercase text-gold-light">Banca de TCC</p>
-                  <p class="text-stone-400 text-sm mt-2">Turma de formandos · simulação de banca</p>
-                </div>
-              </article>
-
-              <article data-slide class="slide">
-                <div>
-                  <p class="font-display text-[10px] tracking-[0.35em] text-gold/80">ESTRUTURA DO PITCH</p>
-                  <h2 class="font-serif text-4xl mt-3">O roteiro no palco</h2>
-                </div>
-                <ol class="space-y-3 text-stone-300">
-                  <li class="flex gap-4"><span class="text-gold font-display">01</span> Problema e contexto</li>
-                  <li class="flex gap-4"><span class="text-gold font-display">02</span> Solução e diferencial</li>
-                  <li class="flex gap-4"><span class="text-gold font-display">03</span> Demonstração do projeto</li>
-                  <li class="flex gap-4"><span class="text-gold font-display">04</span> Encerramento e perguntas</li>
-                </ol>
-              </article>
-
-              <article data-slide class="slide">
-                <div>
-                  <p class="font-display text-[10px] tracking-[0.35em] text-gold/80">CRITÉRIOS DA BANCA</p>
-                  <h2 class="font-serif text-4xl mt-3">Como a plateia avalia</h2>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                  <p class="border border-gold/20 px-3 py-3 font-serif text-xl">Clareza</p>
-                  <p class="border border-gold/20 px-3 py-3 font-serif text-xl">Inovação</p>
-                  <p class="border border-gold/20 px-3 py-3 font-serif text-xl">Apresentação</p>
-                  <p class="border border-gold/20 px-3 py-3 font-serif text-xl">Domínio</p>
-                </div>
-              </article>
-              </div>
-            </div>
-            <div class="screen-glow"></div>
-            <div class="mt-5 flex items-center justify-center gap-3">
-              <button type="button" data-slide-dot class="slide-dot is-active" aria-label="Slide 1"></button>
-              <button type="button" data-slide-dot class="slide-dot" aria-label="Slide 2"></button>
-              <button type="button" data-slide-dot class="slide-dot" aria-label="Slide 3"></button>
-            </div>
-          </div>
+          <p id="event-facts-empty" class="hidden text-sm text-stone-500 mt-8">
+            O professor ainda não preencheu data, horário, local ou turma. Isso é feito na área do professor.
+          </p>
         </div>
       </section>
 
-      <section class="max-w-6xl mx-auto px-4 py-20">
-        <p class="font-display text-[11px] uppercase tracking-[0.35em] text-gold text-center">A noite</p>
-        <h2 class="font-serif text-4xl md:text-5xl text-center mt-3">Três atos da banca</h2>
-        <p class="ornament justify-center mt-5 mb-12">✦</p>
-
-        <div class="grid md:grid-cols-3 gap-6">
-          <article class="panel p-8">
-            <p class="program-index">I</p>
-            <h3 class="font-serif text-3xl mt-4 mb-3">Cadastre</h3>
-            <p class="text-stone-400 leading-relaxed">Inscreva a equipe com nome, integrantes e o resumo do projeto que sobe ao palco.</p>
-          </article>
-          <article class="panel p-8">
-            <p class="program-index">II</p>
-            <h3 class="font-serif text-3xl mt-4 mb-3">Apresente</h3>
-            <p class="text-stone-400 leading-relaxed">O professor sorteia a ordem. A programação pública mostra quem apresenta a seguir.</p>
-          </article>
-          <article class="panel p-8">
-            <p class="program-index">III</p>
-            <h3 class="font-serif text-3xl mt-4 mb-3">Vote</h3>
-            <p class="text-stone-400 leading-relaxed">Após cada pitch, a turma avalia clareza, inovação, apresentação e domínio do conteúdo.</p>
-          </article>
+      <section id="projetos" class="max-w-5xl mx-auto px-4 pb-20">
+        <div class="flex flex-wrap items-end justify-between gap-4 mb-8">
+          <div>
+            <p class="section-title mb-3">Programação</p>
+            <h2 class="font-serif text-4xl">Projetos do evento</h2>
+          </div>
+          <p id="order-status" class="text-sm text-stone-400"></p>
         </div>
+
+        <div id="projetos-loading" class="text-stone-400">Carregando projetos…</div>
+        <div id="projetos-empty" class="hidden panel p-10 text-center text-stone-400">
+          Nenhum projeto cadastrado neste evento.
+          <a class="text-gold hover:underline ml-1" href="cadastrar.html">Cadastrar o primeiro</a>.
+        </div>
+        <div id="projetos-grid" class="grid md:grid-cols-2 gap-5"></div>
       </section>
     </main>
 
-    <footer class="site-footer py-12 text-center">
-      <p class="font-display text-[10px] tracking-[0.4em] text-gold/80 uppercase">Banca de TCC</p>
-      <p class="ornament justify-center my-4">✦</p>
-      <p class="text-sm text-stone-500">Simulação de apresentações comerciais · evento acadêmico</p>
+    <footer class="site-footer py-8 text-center text-sm text-stone-500">
+      <span data-event-title>Banca de TCC</span> · projetos da turma
     </footer>
 
     <div id="toast-root" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
-    <div class="hidden student-name remove-student tracking-[0.2em] hover:text-red-200 hover:border-red-400/30 border-white/5 line-clamp-3"></div>
-    <script type="module" src="js/app.js"></script>
-    <script>
-      (function () {
-        const slides = [...document.querySelectorAll("[data-slide]")];
-        const dots = [...document.querySelectorAll("[data-slide-dot]")];
-        let index = 0;
-        let timer;
-
-        const counter = document.getElementById("slide-counter");
-        function go(next) {
-          index = (next + slides.length) % slides.length;
-          slides.forEach((slide, i) => slide.classList.toggle("is-active", i === index));
-          dots.forEach((dot, i) => dot.classList.toggle("is-active", i === index));
-          if (counter) counter.textContent = String(index + 1).padStart(2, "0") + " / 03";
-        }
-
-        function loop() {
-          timer = setInterval(() => go(index + 1), 5200);
-        }
-
-        dots.forEach((dot, i) => {
-          dot.addEventListener("click", () => {
-            clearInterval(timer);
-            go(i);
-            loop();
-          });
-        });
-
-        loop();
-      })();
-    </script>
+    <div class="hidden student-name remove-student tracking-[0.22em] items-start text-3xl mb-2 mb-4 pt-1 text-[10px] text-gold/80 font-display line-clamp-3"></div>
+    <script type="module" src="js/home.js"></script>
   </body>
 </html>
