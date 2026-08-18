@@ -1,4 +1,10 @@
-import { isFirebaseConfigured, loadEvents, eventCardHtml } from "./app.js";
+import {
+  isFirebaseConfigured,
+  loadEvents,
+  eventCardHtml,
+  loadSiteConfig,
+  homeBannerAssets,
+} from "./app.js";
 
 function fillSection(kind, events) {
   const loading = document.getElementById(`events-loading-${kind}`);
@@ -14,6 +20,21 @@ function fillSection(kind, events) {
   grid.innerHTML = events.map(eventCardHtml).join("");
 }
 
+function applyHomeBanner(config) {
+  const img = document.getElementById("home-banner");
+  if (!img) return;
+  const banner = homeBannerAssets(config);
+  img.src = banner.src;
+  img.alt = banner.alt;
+  if (banner.custom) {
+    img.srcset = `${banner.cardSrc} 990w, ${banner.src} 1980w`;
+    img.sizes = "100vw";
+  } else {
+    img.removeAttribute("srcset");
+    img.removeAttribute("sizes");
+  }
+}
+
 async function loadHome() {
   if (!isFirebaseConfigured()) {
     document.getElementById("events-loading-projetos").textContent = "Configure o Firebase para listar os eventos.";
@@ -21,7 +42,8 @@ async function loadHome() {
     return;
   }
 
-  const events = await loadEvents();
+  const [events, siteConfig] = await Promise.all([loadEvents(), loadSiteConfig()]);
+  applyHomeBanner(siteConfig);
   fillSection(
     "projetos",
     events.filter((event) => event.type !== "concurso")

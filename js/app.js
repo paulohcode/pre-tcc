@@ -12,6 +12,8 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth
 import { firebaseConfig, isFirebaseConfigured } from "./firebase-config.js";
 
 export const SITE_NAME = "SESI SENAI Umuarama";
+export const DEFAULT_HOME_BANNER = "uploads/banner.png";
+export const DEFAULT_HOME_BANNER_ALT = "SESI SENAI Umuarama";
 
 export const CRITERIA = [
   { id: "clareza", label: "Clareza" },
@@ -267,6 +269,31 @@ export function average(values) {
 
 export function round1(n) {
   return Math.round(n * 10) / 10;
+}
+
+export function normalizeSiteConfig(data = {}) {
+  return {
+    bannerUrl: data.bannerUrl || "",
+    bannerCardUrl: data.bannerCardUrl || data.bannerUrl || "",
+    bannerAlt: data.bannerAlt || DEFAULT_HOME_BANNER_ALT,
+  };
+}
+
+export function homeBannerAssets(config = {}) {
+  const normalized = normalizeSiteConfig(config);
+  return {
+    src: normalized.bannerUrl || DEFAULT_HOME_BANNER,
+    cardSrc: normalized.bannerCardUrl || normalized.bannerUrl || DEFAULT_HOME_BANNER,
+    alt: normalized.bannerAlt,
+    custom: Boolean(normalized.bannerUrl),
+  };
+}
+
+export async function loadSiteConfig() {
+  const firebase = getFirebase();
+  if (!firebase) return normalizeSiteConfig();
+  const snap = await getDoc(doc(firebase.db, "config", "site"));
+  return normalizeSiteConfig(snap.exists() ? snap.data() : {});
 }
 
 export async function loadEvents() {

@@ -46,10 +46,18 @@ body {
   color: #fff;
 }
 
+.hero-banner {
+  background: #003da5;
+}
+
 .hero-banner img {
   display: block;
   width: 100%;
   height: auto;
+  aspect-ratio: 1980 / 400;
+  object-fit: cover;
+  object-position: center;
+  background: #003da5;
 }
 
 .kicker {
@@ -230,6 +238,12 @@ input[type="range"]::-moz-range-thumb {
 
 .photo-preview {
   border: 1px solid #dbe4f0;
+}
+
+.photo-preview-home {
+  aspect-ratio: 1980 / 400;
+  object-fit: cover;
+  background: #003da5;
 }
 
 .event-thumb {

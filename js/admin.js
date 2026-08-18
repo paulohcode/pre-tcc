@@ -3,6 +3,7 @@ import {
   doc,
   getDocs,
   addDoc,
+  setDoc,
   updateDoc,
   deleteDoc,
   serverTimestamp,
@@ -32,8 +33,12 @@ import {
   allowsQrVote,
   eventPublicUrl,
   renderQrCode,
+  loadSiteConfig,
+  DEFAULT_HOME_BANNER,
+  DEFAULT_HOME_BANNER_ALT,
+  homeBannerAssets,
 } from "./app.js";
-import { bindPhotoField, setPhotoPreview, imageFromField, emptyImages } from "./imgbb.js";
+import { bindPhotoField, setPhotoPreview, imageFromField, emptyImages, uploadHomeBanner } from "./imgbb.js";
 
 const loginSection = document.getElementById("admin-login");
 const panelSection = document.getElementById("admin-panel");
@@ -50,7 +55,13 @@ let projectsById = new Map();
 let currentEventId = null;
 let currentEventImages = emptyImages();
 let currentProjectImages = emptyImages();
+let currentSiteImages = emptyImages();
 let currentKind = "projetos";
+
+function adminTabKind(kind) {
+  if (kind === "home" || kind === "concurso") return kind;
+  return "projetos";
+}
 
 function requireFirebase() {
   if (!isFirebaseConfigured()) {
@@ -61,10 +72,11 @@ function requireFirebase() {
 }
 
 function setAdminTab(kind, { updateUrl = true } = {}) {
-  currentKind = kind === "concurso" ? "concurso" : "projetos";
+  currentKind = adminTabKind(kind);
   document.querySelectorAll("[data-admin-tab]").forEach((btn) => {
     btn.classList.toggle("is-active", btn.dataset.adminTab === currentKind);
   });
+  document.getElementById("tab-home").classList.toggle("hidden", currentKind !== "home");
   document.getElementById("tab-projetos").classList.toggle("hidden", currentKind !== "projetos");
   document.getElementById("tab-concurso").classList.toggle("hidden", currentKind !== "concurso");
   if (updateUrl && !currentEventId) {
@@ -232,6 +244,28 @@ async function loadEventList() {
     "admin-events-concurso",
     events.filter((event) => event.type === "concurso")
   );
+}
+
+function fillHomeBannerForm(config) {
+  const banner = homeBannerAssets(config);
+  currentSiteImages = {
+    imageUrl: config.bannerUrl || "",
+    imageCardUrl: config.bannerCardUrl || config.bannerUrl || "",
+  };
+  document.getElementById("site-banner-alt").value = banner.alt;
+  setPhotoPreview("site-banner", banner.src);
+  const removeBtn = document.getElementById("site-banner-remove");
+  if (removeBtn) removeBtn.classList.toggle("hidden", !banner.custom);
+}
+
+async function loadHomeBannerForm() {
+  fillHomeBannerForm(await loadSiteConfig());
+}
+
+async function saveSiteBanner(payload) {
+  const firebase = requireFirebase();
+  if (!firebase) return;
+  await setDoc(doc(firebase.db, "config", "site"), payload, { merge: true });
 }
 
 async function deleteEvent(id) {
@@ -489,6 +523,29 @@ document.getElementById("admin-logout").addEventListener("click", async () => {
 
 document.getElementById("form-new-projetos").addEventListener("submit", (event) => submitNewEvent(event, "projetos"));
 document.getElementById("form-new-concurso").addEventListener("submit", (event) => submitNewEvent(event, "concurso"));
+document.getElementById("form-home-banner").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const firebase = requireFirebase();
+  if (!firebase) return;
+  const submitBtn = event.currentTarget.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  try {
+    const images = await imageFromField("site-banner", currentSiteImages, uploadHomeBanner);
+    const bannerAlt = document.getElementById("site-banner-alt").value.trim() || DEFAULT_HOME_BANNER_ALT;
+    await saveSiteBanner({
+      bannerUrl: images.imageUrl || "",
+      bannerCardUrl: images.imageCardUrl || "",
+      bannerAlt,
+    });
+    showToast("Banner da página principal salvo.");
+    await loadHomeBannerForm();
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "Não foi possível salvar o banner.", "error");
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
 
 async function submitNewEvent(event, type) {
   event.preventDefault();
@@ -627,6 +684,29 @@ document.getElementById("form-edit-projeto").addEventListener("submit", async (e
 
 bindPhotoField("new-projetos-image");
 bindPhotoField("new-concurso-image");
+bindPhotoField("site-banner", {
+  confirmRemove: () => {
+    if (currentSiteImages.imageUrl) {
+      return confirm("Excluir o banner cadastrado? A página principal volta ao banner padrão.");
+    }
+    return true;
+  },
+  afterRemove: async () => {
+    if (currentSiteImages.imageUrl) {
+      try {
+        await saveSiteBanner({ bannerUrl: "", bannerCardUrl: "" });
+        currentSiteImages = emptyImages();
+        showToast("Banner restaurado para o padrão.");
+      } catch (error) {
+        console.error(error);
+        showToast("Não foi possível excluir o banner.", "error");
+        return;
+      }
+    }
+    setPhotoPreview("site-banner", DEFAULT_HOME_BANNER);
+    document.getElementById("site-banner-remove")?.classList.add("hidden");
+  },
+});
 bindPhotoField("event-image", {
   confirmRemove: () => {
     if (currentEventId && currentEventImages.imageUrl) return confirm("Excluir a imagem deste evento?");
@@ -687,7 +767,7 @@ if (firebase) {
         const requested = params.get("evento");
         const requestedKind = params.get("tipo");
         if (requestedKind) setAdminTab(requestedKind, { updateUrl: false });
-        await loadEventList();
+        await Promise.all([loadEventList(), loadHomeBannerForm()]);
         if (requested) await openEvent(requested);
       } catch (error) {
         console.error(error);

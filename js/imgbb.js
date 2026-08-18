@@ -3,6 +3,8 @@ import { imgbbApiKey } from "./imgbb-config.js";
 const MAX_BYTES = 5 * 1024 * 1024;
 const BANNER = { width: 1920, height: 1080 };
 const CARD = { width: 960, height: 540 };
+const HOME_BANNER = { width: 1980, height: 400 };
+const HOME_BANNER_CARD = { width: 990, height: 200 };
 
 export function isImgbbConfigured() {
   return Boolean(imgbbApiKey && !String(imgbbApiKey).toLowerCase().includes("cole"));
@@ -28,14 +30,17 @@ function loadImageFile(file) {
   });
 }
 
-function drawBanner(source, width, height) {
+function drawFitted(source, width, height, fit = "contain") {
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext("2d");
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, width, height);
-  const scale = Math.min(width / source.width, height / source.height);
+  const scale =
+    fit === "cover"
+      ? Math.max(width / source.width, height / source.height)
+      : Math.min(width / source.width, height / source.height);
   const drawW = source.width * scale;
   const drawH = source.height * scale;
   ctx.imageSmoothingEnabled = true;
@@ -76,7 +81,7 @@ async function postToImgbb(file) {
   return url;
 }
 
-export async function uploadToImgbb(file) {
+async function uploadFitted(file, full, card, fit, names) {
   if (!file) return emptyImages();
   if (!isImgbbConfigured()) {
     throw new Error("Configure a chave do ImgBB em js/imgbb-config.js");
@@ -90,11 +95,22 @@ export async function uploadToImgbb(file) {
 
   const source = await loadImageFile(file);
   const [fullFile, cardFile] = await Promise.all([
-    canvasToJpeg(drawBanner(source, BANNER.width, BANNER.height), "capa.jpg", 0.86),
-    canvasToJpeg(drawBanner(source, CARD.width, CARD.height), "capa-card.jpg", 0.82),
+    canvasToJpeg(drawFitted(source, full.width, full.height, fit), names.full, 0.86),
+    canvasToJpeg(drawFitted(source, card.width, card.height, fit), names.card, 0.82),
   ]);
   const [imageUrl, imageCardUrl] = await Promise.all([postToImgbb(fullFile), postToImgbb(cardFile)]);
   return { imageUrl, imageCardUrl };
+}
+
+export async function uploadToImgbb(file) {
+  return uploadFitted(file, BANNER, CARD, "contain", { full: "capa.jpg", card: "capa-card.jpg" });
+}
+
+export async function uploadHomeBanner(file) {
+  return uploadFitted(file, HOME_BANNER, HOME_BANNER_CARD, "cover", {
+    full: "banner.jpg",
+    card: "banner-card.jpg",
+  });
 }
 
 export function bindPhotoField(inputId, options = {}) {
@@ -141,10 +157,10 @@ export function setPhotoPreview(inputId, url) {
   }
 }
 
-export async function imageFromField(inputId, current = emptyImages()) {
+export async function imageFromField(inputId, current = emptyImages(), upload = uploadToImgbb) {
   const input = document.getElementById(inputId);
   const file = input?.files?.[0];
-  if (file) return uploadToImgbb(file);
+  if (file) return upload(file);
   if (input?.dataset.removed === "1") return emptyImages();
   return {
     imageUrl: current.imageUrl || "",
