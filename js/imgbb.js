@@ -3,8 +3,8 @@ import { imgbbApiKey } from "./imgbb-config.js";
 const MAX_BYTES = 5 * 1024 * 1024;
 const BANNER = { width: 1920, height: 1080 };
 const CARD = { width: 960, height: 540 };
-const HOME_BANNER = { width: 1980, height: 400 };
-const HOME_BANNER_CARD = { width: 990, height: 200 };
+const HOME_RATIO = 1980 / 400;
+const HOME_BANNER = { width: 3960, height: 800 };
 
 export function isImgbbConfigured() {
   return Boolean(imgbbApiKey && !String(imgbbApiKey).toLowerCase().includes("cole"));
@@ -43,9 +43,49 @@ function drawFitted(source, width, height, fit = "contain") {
       : Math.min(width / source.width, height / source.height);
   const drawW = source.width * scale;
   const drawH = source.height * scale;
-  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingEnabled = scale < 0.99;
   ctx.imageSmoothingQuality = "high";
   ctx.drawImage(source, (width - drawW) / 2, (height - drawH) / 2, drawW, drawH);
+  return canvas;
+}
+
+function almostHomeRatio(width, height) {
+  return Math.abs(width / height - HOME_RATIO) / HOME_RATIO < 0.03;
+}
+
+function canvasToFile(canvas, name, mime, quality) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          reject(new Error("Não foi possível gerar a imagem."));
+          return;
+        }
+        resolve(new File([blob], name, { type: mime }));
+      },
+      mime,
+      quality
+    );
+  });
+}
+
+function drawHomeBanner(source) {
+  const cropW = Math.min(source.width, source.height * HOME_RATIO);
+  const cropH = cropW / HOME_RATIO;
+  const srcX = (source.width - cropW) / 2;
+  const srcY = (source.height - cropH) / 2;
+  const outW = Math.max(1, Math.round(Math.min(HOME_BANNER.width, cropW)));
+  const outH = Math.max(1, Math.round(outW / HOME_RATIO));
+  const canvas = document.createElement("canvas");
+  canvas.width = outW;
+  canvas.height = outH;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#003da5";
+  ctx.fillRect(0, 0, outW, outH);
+  const scale = outW / cropW;
+  ctx.imageSmoothingEnabled = scale < 0.99;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(source, srcX, srcY, cropW, cropH, 0, 0, outW, outH);
   return canvas;
 }
 
@@ -66,16 +106,10 @@ function canvasToJpeg(canvas, name, quality) {
 }
 
 function pickImgbbUrl(data = {}) {
-  const candidates = [data.image?.url, data.display_url, data.medium?.url, data.url]
+  const candidates = [data.image?.url, data.display_url, data.url, data.medium?.url]
     .map((url) => String(url || "").trim())
     .filter((url) => /^https?:\/\//i.test(url));
-  return (
-    candidates.find((url) => url.includes("i.ibb.co")) ||
-    candidates.find((url) => /\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(url)) ||
-    candidates.find((url) => !url.includes("ibb.co/")) ||
-    candidates[0] ||
-    ""
-  );
+  return candidates.find((url) => url.includes("i.ibb.co")) || candidates[0] || "";
 }
 
 async function postToImgbb(file) {
@@ -120,10 +154,38 @@ export async function uploadToImgbb(file) {
 }
 
 export async function uploadHomeBanner(file) {
-  return uploadFitted(file, HOME_BANNER, HOME_BANNER_CARD, "cover", {
-    full: "banner.jpg",
-    card: "banner-card.jpg",
-  });
+  if (!file) return emptyImages();
+  if (!isImgbbConfigured()) {
+    throw new Error("Configure a chave do ImgBB em js/imgbb-config.js");
+  }
+  if (!String(file.type || "").startsWith("image/")) {
+    throw new Error("Envie um arquivo de imagem (JPG, PNG ou WEBP).");
+  }
+  if (file.size > MAX_BYTES) {
+    throw new Error("A imagem deve ter no máximo 5 MB.");
+  }
+
+  const source = await loadImageFile(file);
+  const keepOriginal =
+    almostHomeRatio(source.width, source.height) &&
+    source.width >= 1920 &&
+    /image\/(png|jpeg|jpg|webp)/i.test(file.type);
+
+  if (keepOriginal) {
+    const imageUrl = await postToImgbb(file);
+    return { imageUrl, imageCardUrl: imageUrl };
+  }
+
+  const canvas = drawHomeBanner(source);
+  const usePng = /image\/(png|webp)/i.test(file.type);
+  let output = usePng
+    ? await canvasToFile(canvas, "banner.png", "image/png")
+    : await canvasToFile(canvas, "banner.jpg", "image/jpeg", 0.95);
+  if (output.size > MAX_BYTES) {
+    output = await canvasToFile(canvas, "banner.jpg", "image/jpeg", 0.9);
+  }
+  const imageUrl = await postToImgbb(output);
+  return { imageUrl, imageCardUrl: imageUrl };
 }
 
 export function bindPhotoField(inputId, options = {}) {

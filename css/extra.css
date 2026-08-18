@@ -55,7 +55,7 @@ body {
   width: 100%;
   height: auto;
   aspect-ratio: 1980 / 400;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
   background: #003da5;
 }
@@ -242,7 +242,7 @@ input[type="range"]::-moz-range-thumb {
 
 .photo-preview-home {
   aspect-ratio: 1980 / 400;
-  object-fit: cover;
+  object-fit: contain;
   background: #003da5;
 }
 
