@@ -184,7 +184,7 @@ export function projectCardHtml(project, event) {
   return `
     <a href="projeto.html?id=${encodeURIComponent(project.id)}" class="card-link panel overflow-hidden">
       ${cover}
-      <div class="p-6">
+      <div class="p-5 sm:p-6">
       ${
         contest
           ? ""
@@ -348,9 +348,9 @@ export function eventCardHtml(event) {
   return `
     <a href="evento.html?id=${encodeURIComponent(event.id)}" class="card-link panel overflow-hidden">
       ${cover}
-      <div class="p-6">
+      <div class="p-5 sm:p-6">
         <span class="badge mb-4">${escapeHtml(type.label)}</span>
-        <h2 class="text-2xl font-semibold mb-2">${escapeHtml(event.title)}</h2>
+        <h2 class="text-xl sm:text-2xl font-semibold mb-2">${escapeHtml(event.title)}</h2>
         <p class="text-sm text-slate-500 mb-3">${escapeHtml(date)}${event.location ? ` · ${escapeHtml(event.location)}` : ""}${escapeHtml(audience)}</p>
         <p class="text-slate-600 text-sm line-clamp-3">${escapeHtml(event.description || "Abra para ver os detalhes e as inscrições.")}</p>
       </div>

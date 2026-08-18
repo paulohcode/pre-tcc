@@ -2,7 +2,7 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Inscrição — SESI SENAI Umuarama</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -30,17 +30,17 @@
     </div>
 
     <header class="site-header">
-      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-        <a href="index.html" class="flex items-center gap-3 text-white">
+      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
+        <a href="index.html" class="flex items-center gap-2 sm:gap-3 text-white min-w-0">
           <span class="logo-mark">SESI<br />SENAI</span>
-          <div>
-            <p class="text-[11px] uppercase tracking-[0.18em] text-white/70">Umuarama</p>
-            <p class="font-semibold leading-tight">Portal de eventos</p>
+          <div class="min-w-0">
+            <p class="header-kicker text-[11px] uppercase tracking-[0.18em] text-white/70">Umuarama</p>
+            <p class="font-semibold leading-tight truncate">Portal de eventos</p>
           </div>
         </a>
-        <nav class="flex items-center gap-1">
-          <a class="nav-link px-3 py-2" href="index.html">Eventos</a>
-          <a class="nav-link px-3 py-2" href="admin.html">Área interna</a>
+        <nav class="flex items-center shrink-0">
+          <a class="nav-link px-2 sm:px-3 py-2" href="index.html">Eventos</a>
+          <a class="nav-link px-2 sm:px-3 py-2" href="admin.html">Área interna</a>
         </nav>
       </div>
     </header>
@@ -51,20 +51,8 @@
       <div id="projeto-loading" class="mt-8 text-slate-500">Carregando…</div>
       <div id="projeto-missing" class="hidden mt-8 text-slate-500">Inscrição não encontrada.</div>
 
-      <div id="projeto-content" class="hidden mt-8 grid lg:grid-cols-[1.2fr_0.8fr] gap-8">
-        <article class="panel overflow-hidden">
-          <div id="projeto-cover-wrap" class="hidden">
-            <img id="projeto-cover" alt="" class="event-cover event-cover-hero" />
-          </div>
-          <div class="p-8">
-          <p id="projeto-order" class="kicker mb-3"></p>
-          <h1 id="projeto-title" class="text-4xl font-semibold mb-4"></h1>
-          <p id="projeto-students" class="text-slate-600 mb-6"></p>
-          <p id="projeto-description" class="text-slate-600 leading-relaxed whitespace-pre-wrap"></p>
-          </div>
-        </article>
-
-        <aside class="panel p-8 h-fit">
+      <div id="projeto-content" class="hidden mt-8 grid lg:grid-cols-[1.2fr_0.8fr] gap-6 lg:gap-8">
+        <aside class="panel p-8 h-fit order-1 lg:order-2">
           <p class="kicker mb-2">Votação</p>
           <h2 id="vote-title" class="text-2xl font-semibold mb-1">Avaliar</h2>
           <p id="vote-help" class="text-sm text-slate-500 mb-6">Notas de 0 a 10 em cada critério. A média entra no ranking do evento.</p>
@@ -94,7 +82,7 @@
             </div>
             <div>
               <label for="voter-pin" class="block text-sm mb-2">PIN de 4 dígitos</label>
-              <input id="voter-pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" class="field tracking-[0.4em]" placeholder="••••" />
+              <input id="voter-pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" class="field tracking-[0.4em]" placeholder="••••" autocomplete="one-time-code" />
               <p class="text-xs text-slate-500 mt-2">Na primeira votação este PIN é criado. Nas próximas, use o mesmo.</p>
             </div>
             <button type="submit" class="btn-primary w-full py-3">Continuar para votar</button>
@@ -105,9 +93,21 @@
             <div id="criteria-fields" class="space-y-5"></div>
             <p class="text-sm"><span id="vote-preview-label">Média deste voto:</span> <span id="vote-preview" class="text-blue font-semibold">5.0</span></p>
             <button type="submit" id="submit-voto" class="btn-primary w-full py-3 disabled:opacity-50">Enviar voto</button>
-            <button type="button" id="logout-aluno" class="w-full text-sm text-slate-500 hover:text-slate-800">Trocar de votante</button>
+            <button type="button" id="logout-aluno" class="w-full text-sm text-slate-500 hover:text-slate-800 py-3">Trocar de votante</button>
           </form>
         </aside>
+
+        <article class="panel overflow-hidden order-2 lg:order-1">
+          <div id="projeto-cover-wrap" class="hidden">
+            <img id="projeto-cover" alt="" class="event-cover event-cover-hero" />
+          </div>
+          <div class="p-8">
+          <p id="projeto-order" class="kicker mb-3"></p>
+          <h1 id="projeto-title" class="text-4xl font-semibold mb-4 break-words"></h1>
+          <p id="projeto-students" class="text-slate-600 mb-6"></p>
+          <p id="projeto-description" class="text-slate-600 leading-relaxed whitespace-pre-wrap"></p>
+          </div>
+        </article>
       </div>
     </main>
 
