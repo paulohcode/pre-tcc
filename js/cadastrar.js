@@ -74,7 +74,14 @@ async function setup() {
   const type = eventType(event.type);
   document.title = `${type.register} — ${event.title}`;
   document.getElementById("page-title").textContent = type.register;
-  document.getElementById("page-lead").textContent = `Inscrição em ${event.title}. Inclua todos os integrantes com nome e sobrenome.`;
+  document.getElementById("page-lead").textContent =
+    event.type === "concurso"
+      ? `Inscrição no concurso ${event.title}. Informe os autores com nome e sobrenome.`
+      : `Inscrição em ${event.title}. Inclua todos os integrantes da equipe com nome e sobrenome.`;
+  document.getElementById("members-label").textContent = type.membersLabel;
+  document.getElementById("add-student").textContent = type.addMember;
+  document.getElementById("title").placeholder = type.titlePlaceholder;
+  document.getElementById("title-label").textContent = event.type === "concurso" ? "Nome do trabalho" : "Nome do projeto";
   document.getElementById("back-evento").href = `evento.html?id=${encodeURIComponent(event.id)}`;
   submitBtn.textContent = type.register;
 }

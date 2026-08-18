@@ -10,6 +10,7 @@ import {
   allowsQrVote,
   eventPublicUrl,
   renderQrCode,
+  isContest,
 } from "./app.js";
 
 const params = new URLSearchParams(window.location.search);
@@ -48,6 +49,15 @@ async function loadPage() {
     event.description || "Confira as inscrições deste evento.";
   document.getElementById("evento-register").textContent = type.register;
   document.getElementById("evento-register").href = `cadastrar.html?evento=${encodeURIComponent(event.id)}`;
+  const cover = document.getElementById("evento-cover");
+  if (event.imageUrl) {
+    cover.src = event.imageUrl;
+    cover.alt = event.title;
+    cover.classList.remove("hidden");
+  } else {
+    cover.removeAttribute("src");
+    cover.classList.add("hidden");
+  }
   document.getElementById("entries-title").textContent = type.plural.charAt(0).toUpperCase() + type.plural.slice(1);
 
   const facts = eventFacts(event);
@@ -76,9 +86,14 @@ async function loadPage() {
 
   const projects = await loadEventProjects(event.id);
   entriesLoading.classList.add("hidden");
-  document.getElementById("order-status").textContent = event.orderDrawnAt
-    ? "Ordem das apresentações já sorteada."
-    : "A ordem ainda não foi sorteada.";
+  const orderStatus = document.getElementById("order-status");
+  if (isContest(event)) {
+    orderStatus.textContent = "";
+  } else {
+    orderStatus.textContent = event.orderDrawnAt
+      ? "Ordem das apresentações já sorteada."
+      : "A ordem ainda não foi sorteada.";
+  }
 
   if (!projects.length) {
     entriesEmpty.classList.remove("hidden");

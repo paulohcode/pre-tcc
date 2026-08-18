@@ -67,102 +67,133 @@
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p class="kicker mb-2">Professor</p>
-            <h1 class="text-4xl font-semibold">Gestão de eventos</h1>
+            <h1 class="text-4xl font-semibold">Área interna</h1>
           </div>
           <button id="admin-logout" class="text-sm text-slate-500 hover:text-slate-800">Sair</button>
         </div>
 
-        <div id="events-list-view" class="space-y-8">
-          <form id="form-novo-evento" class="panel p-8 space-y-5">
-            <h2 class="text-2xl font-semibold">Cadastrar evento</h2>
-            <div class="grid md:grid-cols-2 gap-4">
-              <div class="md:col-span-2">
-                <label for="new-title" class="block text-sm mb-2">Nome do evento</label>
-                <input id="new-title" required maxlength="80" class="field" placeholder="Ex.: Banca de TCC 2026" />
-              </div>
-              <div>
-                <label for="new-type" class="block text-sm mb-2">Tipo</label>
-                <select id="new-type" class="field">
-                  <option value="projetos">Projetos</option>
-                  <option value="concurso">Concurso</option>
-                </select>
-              </div>
-              <div>
-                <label for="new-class" class="block text-sm mb-2">Turma</label>
-                <input id="new-class" maxlength="80" class="field" />
-              </div>
-              <div>
-                <label for="new-audience" class="block text-sm mb-2">Público-alvo</label>
-                <input id="new-audience" maxlength="80" class="field" placeholder="Ex.: Alunos da turma, visitantes, comunidade" />
-              </div>
-              <div class="md:col-span-2">
-                <label for="new-vote-access" class="block text-sm mb-2">Como o público vota</label>
-                <select id="new-vote-access" class="field">
-                  <option value="alunos">Somente inscritos (nome da lista + PIN)</option>
-                  <option value="qrcode">Público com QR Code no celular</option>
-                  <option value="ambos">Inscritos e público (QR Code + lista)</option>
-                </select>
-                <p class="text-xs text-slate-500 mt-2">O QR Code leva o celular direto à página do evento para votar. O site precisa estar publicado na internet.</p>
-              </div>
-              <div>
-                <label for="new-date" class="block text-sm mb-2">Data</label>
-                <input id="new-date" type="date" class="field" />
-              </div>
-              <div>
-                <label for="new-time" class="block text-sm mb-2">Horário</label>
-                <input id="new-time" type="time" class="field" />
-              </div>
-              <div class="md:col-span-2">
-                <label for="new-location" class="block text-sm mb-2">Local</label>
-                <input id="new-location" maxlength="80" class="field" placeholder="Ex.: Auditório SESI SENAI Umuarama" />
-              </div>
-              <div class="md:col-span-2">
-                <label for="new-description" class="block text-sm mb-2">Descrição</label>
-                <textarea id="new-description" rows="3" maxlength="1000" class="field resize-y"></textarea>
-              </div>
-            </div>
-            <button type="submit" class="btn-primary px-5 py-3">Publicar evento</button>
-          </form>
+        <div id="admin-tabs" class="flex flex-wrap gap-2">
+          <button type="button" data-admin-tab="projetos" class="admin-tab is-active">Eventos de projetos</button>
+          <button type="button" data-admin-tab="concurso" class="admin-tab">Concursos</button>
+        </div>
 
-          <div>
-            <h2 class="text-2xl font-semibold mb-4">Eventos cadastrados</h2>
-            <div id="admin-events" class="space-y-3"></div>
+        <div id="events-list-view" class="space-y-8">
+          <div id="tab-projetos" class="space-y-8">
+            <form id="form-new-projetos" class="panel p-8 space-y-5">
+              <div>
+                <h2 class="text-2xl font-semibold">Cadastrar evento de projetos</h2>
+                <p class="text-sm text-slate-500 mt-2">Banca ou apresentação: as equipes se inscrevem, você sorteia a ordem e os alunos avaliam por critérios.</p>
+              </div>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                  <label for="new-projetos-title" class="block text-sm mb-2">Nome do evento</label>
+                  <input id="new-projetos-title" name="title" required maxlength="80" class="field" placeholder="Ex.: Banca de TCC 2026" />
+                </div>
+                <div>
+                  <label for="new-projetos-class" class="block text-sm mb-2">Turma</label>
+                  <input id="new-projetos-class" name="className" maxlength="80" class="field" />
+                </div>
+                <div>
+                  <label for="new-projetos-location" class="block text-sm mb-2">Local</label>
+                  <input id="new-projetos-location" name="location" maxlength="80" class="field" placeholder="Ex.: Auditório SESI SENAI Umuarama" />
+                </div>
+                <div>
+                  <label for="new-projetos-date" class="block text-sm mb-2">Data</label>
+                  <input id="new-projetos-date" name="date" type="date" class="field" />
+                </div>
+                <div>
+                  <label for="new-projetos-time" class="block text-sm mb-2">Horário</label>
+                  <input id="new-projetos-time" name="time" type="time" class="field" />
+                </div>
+                <div class="md:col-span-2">
+                  <label for="new-projetos-description" class="block text-sm mb-2">Descrição</label>
+                  <textarea id="new-projetos-description" name="description" rows="3" maxlength="1000" class="field resize-y"></textarea>
+                </div>
+                <div class="md:col-span-2">
+                  <label for="new-projetos-image" class="block text-sm mb-2">Foto do evento</label>
+                  <input id="new-projetos-image" type="file" accept="image/*" class="field" />
+                  <p class="text-xs text-slate-500 mt-2">JPG, PNG ou WEBP, até 5 MB. A imagem fica no ImgBB.</p>
+                  <img id="new-projetos-image-preview" alt="Prévia da foto" class="photo-preview hidden mt-3" />
+                  <button type="button" id="new-projetos-image-remove" class="hidden mt-2 text-sm text-slate-500 hover:text-red-600">Remover foto</button>
+                </div>
+              </div>
+              <button type="submit" class="btn-primary px-5 py-3">Publicar evento de projetos</button>
+            </form>
+            <div>
+              <h2 class="text-2xl font-semibold mb-4">Eventos de projetos</h2>
+              <div id="admin-events-projetos" class="space-y-3"></div>
+            </div>
+          </div>
+
+          <div id="tab-concurso" class="hidden space-y-8">
+            <form id="form-new-concurso" class="panel p-8 space-y-5">
+              <div>
+                <h2 class="text-2xl font-semibold">Cadastrar concurso</h2>
+                <p class="text-sm text-slate-500 mt-2">O público se inscreve com o trabalho e vota pelo celular com QR Code. O ranking usa uma nota de 0 a 10.</p>
+              </div>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                  <label for="new-concurso-title" class="block text-sm mb-2">Nome do concurso</label>
+                  <input id="new-concurso-title" name="title" required maxlength="80" class="field" placeholder="Ex.: Concurso de inovação 2026" />
+                </div>
+                <div>
+                  <label for="new-concurso-audience" class="block text-sm mb-2">Público-alvo</label>
+                  <input id="new-concurso-audience" name="audience" maxlength="80" class="field" placeholder="Ex.: Visitantes, comunidade, alunos" />
+                </div>
+                <div>
+                  <label for="new-concurso-location" class="block text-sm mb-2">Local</label>
+                  <input id="new-concurso-location" name="location" maxlength="80" class="field" placeholder="Ex.: Pátio SESI SENAI Umuarama" />
+                </div>
+                <div>
+                  <label for="new-concurso-date" class="block text-sm mb-2">Data</label>
+                  <input id="new-concurso-date" name="date" type="date" class="field" />
+                </div>
+                <div>
+                  <label for="new-concurso-time" class="block text-sm mb-2">Horário</label>
+                  <input id="new-concurso-time" name="time" type="time" class="field" />
+                </div>
+                <div class="md:col-span-2">
+                  <label for="new-concurso-description" class="block text-sm mb-2">Descrição</label>
+                  <textarea id="new-concurso-description" name="description" rows="3" maxlength="1000" class="field resize-y"></textarea>
+                </div>
+                <div class="md:col-span-2">
+                  <label for="new-concurso-image" class="block text-sm mb-2">Foto do concurso</label>
+                  <input id="new-concurso-image" type="file" accept="image/*" class="field" />
+                  <p class="text-xs text-slate-500 mt-2">JPG, PNG ou WEBP, até 5 MB. A imagem fica no ImgBB.</p>
+                  <img id="new-concurso-image-preview" alt="Prévia da foto" class="photo-preview hidden mt-3" />
+                  <button type="button" id="new-concurso-image-remove" class="hidden mt-2 text-sm text-slate-500 hover:text-red-600">Remover foto</button>
+                </div>
+              </div>
+              <button type="submit" class="btn-primary px-5 py-3">Publicar concurso</button>
+            </form>
+            <div>
+              <h2 class="text-2xl font-semibold mb-4">Concursos cadastrados</h2>
+              <div id="admin-events-concurso" class="space-y-3"></div>
+            </div>
           </div>
         </div>
 
         <div id="event-detail-view" class="hidden space-y-8">
-          <button type="button" id="btn-back-events" class="text-sm text-blue hover:underline">← Todos os eventos</button>
+          <button type="button" id="btn-back-events" class="text-sm text-blue hover:underline">← Voltar</button>
 
           <form id="form-evento" class="panel p-8 space-y-5">
             <input type="hidden" id="event-id" />
-            <h2 class="text-2xl font-semibold">Dados do evento</h2>
+            <input type="hidden" id="event-type-input" />
+            <h2 id="event-detail-heading" class="text-2xl font-semibold">Dados do evento</h2>
+            <p id="event-type-label" class="text-sm text-slate-500"></p>
+            <p id="vote-access-locked" class="text-sm text-slate-500"></p>
             <div class="grid md:grid-cols-2 gap-4">
               <div class="md:col-span-2">
                 <label for="event-title-input" class="block text-sm mb-2">Nome</label>
                 <input id="event-title-input" maxlength="80" class="field" />
               </div>
-              <div>
-                <label for="event-type-input" class="block text-sm mb-2">Tipo</label>
-                <select id="event-type-input" class="field">
-                  <option value="projetos">Projetos</option>
-                  <option value="concurso">Concurso</option>
-                </select>
-              </div>
-              <div>
+              <div id="event-class-wrap">
                 <label for="event-class-input" class="block text-sm mb-2">Turma</label>
                 <input id="event-class-input" maxlength="80" class="field" />
               </div>
-              <div>
+              <div id="event-audience-wrap" class="hidden">
                 <label for="event-audience-input" class="block text-sm mb-2">Público-alvo</label>
                 <input id="event-audience-input" maxlength="80" class="field" placeholder="Ex.: Alunos da turma, visitantes, comunidade" />
-              </div>
-              <div class="md:col-span-2">
-                <label for="event-vote-access-input" class="block text-sm mb-2">Como o público vota</label>
-                <select id="event-vote-access-input" class="field">
-                  <option value="alunos">Somente inscritos (nome da lista + PIN)</option>
-                  <option value="qrcode">Público com QR Code no celular</option>
-                  <option value="ambos">Inscritos e público (QR Code + lista)</option>
-                </select>
               </div>
               <div>
                 <label for="event-date-input" class="block text-sm mb-2">Data</label>
@@ -180,9 +211,18 @@
                 <label for="event-description-input" class="block text-sm mb-2">Descrição</label>
                 <textarea id="event-description-input" rows="4" maxlength="1000" class="field resize-y"></textarea>
               </div>
+              <div class="md:col-span-2">
+                <label for="event-image" class="block text-sm mb-2">Foto</label>
+                <input id="event-image" type="file" accept="image/*" class="field" />
+                <p class="text-xs text-slate-500 mt-2">Escolha um arquivo para substituir a foto atual.</p>
+                <img id="event-image-preview" alt="Prévia da foto" class="photo-preview hidden mt-3" />
+                <button type="button" id="event-image-remove" class="hidden mt-2 text-sm text-slate-500 hover:text-red-600">
+                  Remover foto
+                </button>
+              </div>
             </div>
             <div class="flex flex-wrap gap-3">
-              <button type="submit" class="btn-primary px-5 py-3">Salvar evento</button>
+              <button type="submit" class="btn-primary px-5 py-3">Salvar</button>
               <a id="event-view-public" href="index.html" class="btn-outline px-5 py-3">Ver página pública</a>
             </div>
           </form>
@@ -205,7 +245,7 @@
           </div>
 
           <div class="grid md:grid-cols-2 gap-5">
-            <div class="panel p-6">
+          <div id="draw-panel" class="panel p-6">
               <h2 class="text-xl font-semibold mb-2">Ordem das apresentações</h2>
               <p id="draw-status" class="text-sm text-slate-500 mb-4">Ainda não sorteada.</p>
               <button id="btn-sortear" class="btn-primary w-full py-3">Sortear ordem</button>
@@ -229,8 +269,8 @@
                   <tr>
                     <th class="py-3 pr-3 font-medium">#</th>
                     <th class="py-3 pr-3 font-medium">Inscrição</th>
-                    <th class="py-3 pr-3 font-medium">Integrantes</th>
-                    <th class="py-3 pr-3 font-medium">Média</th>
+                    <th class="py-3 pr-3 font-medium" id="ranking-members-head">Integrantes</th>
+                    <th class="py-3 pr-3 font-medium" id="ranking-score-head">Média</th>
                     <th class="py-3 font-medium">Votos</th>
                   </tr>
                 </thead>
@@ -254,7 +294,7 @@
                 <input id="edit-title" required maxlength="120" class="field" />
               </div>
               <div>
-                <label class="block text-sm mb-2">Integrantes</label>
+                <label id="edit-members-label" class="block text-sm mb-2">Integrantes</label>
                 <div id="edit-students-list" class="space-y-3"></div>
                 <button type="button" id="edit-add-student" class="mt-3 text-sm text-blue hover:underline">+ Adicionar integrante</button>
               </div>
@@ -271,7 +311,7 @@
 
           <div class="panel p-8">
             <h2 id="admin-entries-title" class="text-2xl font-semibold mb-2">Inscrições</h2>
-            <p class="text-sm text-slate-500 mb-4">Projetos ou trabalhos deste evento.</p>
+            <p id="admin-entries-help" class="text-sm text-slate-500 mb-4">Projetos deste evento.</p>
             <div id="admin-projects" class="space-y-3"></div>
           </div>
         </div>

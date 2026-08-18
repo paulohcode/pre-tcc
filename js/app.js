@@ -29,6 +29,12 @@ export const EVENT_TYPES = {
     register: "Cadastrar projeto",
     vote: "Avaliar projeto",
     empty: "Nenhum projeto cadastrado neste evento.",
+    membersLabel: "Integrantes",
+    addMember: "+ Adicionar integrante",
+    titlePlaceholder: "Nome do projeto",
+    voteHelp: "Notas de 0 a 10 em cada critério. A média entra no ranking da banca.",
+    hasDraw: true,
+    voteAccess: "alunos",
   },
   concurso: {
     id: "concurso",
@@ -38,8 +44,16 @@ export const EVENT_TYPES = {
     register: "Inscrever trabalho",
     vote: "Votar no trabalho",
     empty: "Nenhum trabalho inscrito neste concurso.",
+    membersLabel: "Autores",
+    addMember: "+ Adicionar autor",
+    titlePlaceholder: "Nome do trabalho",
+    voteHelp: "Dê uma nota de 0 a 10. A média das notas do público define o ranking.",
+    hasDraw: false,
+    voteAccess: "qrcode",
   },
 };
+
+export const CONTEST_CRITERIA = [{ id: "geral", label: "Nota" }];
 
 export const VOTE_ACCESS = {
   alunos: {
@@ -58,6 +72,18 @@ export const VOTE_ACCESS = {
 
 export function eventType(type) {
   return EVENT_TYPES[type] || EVENT_TYPES.projetos;
+}
+
+export function isContest(event) {
+  return event?.type === "concurso";
+}
+
+export function voteCriteria(event) {
+  return isContest(event) ? CONTEST_CRITERIA : CRITERIA;
+}
+
+export function lockedVoteAccess(type) {
+  return eventType(type).voteAccess;
 }
 
 export function voteAccess(mode) {
@@ -90,7 +116,6 @@ export async function renderQrCode(canvas, url) {
 
 export function normalizeEvent(id, data = {}) {
   const type = EVENT_TYPES[data.type] ? data.type : "projetos";
-  const access = VOTE_ACCESS[data.voteAccess] ? data.voteAccess : "alunos";
   return {
     id,
     title: data.title || "Evento",
@@ -101,7 +126,8 @@ export function normalizeEvent(id, data = {}) {
     location: data.location || "",
     className: data.className || "",
     audience: data.audience || "",
-    voteAccess: access,
+    voteAccess: lockedVoteAccess(type),
+    imageUrl: data.imageUrl || "",
     votingOpen: Boolean(data.votingOpen),
     orderDrawnAt: data.orderDrawnAt || null,
     createdAt: data.createdAt || null,
@@ -148,14 +174,19 @@ export function formatOrder(order) {
 
 export function projectCardHtml(project, event) {
   const type = eventType(event?.type);
-  const orderLabel = formatOrder(project.order);
-  const index = project.order ? String(project.order).padStart(2, "0") : "—";
+  const contest = isContest(event);
+  const orderLabel = contest ? "" : formatOrder(project.order);
+  const index = contest ? "" : project.order ? String(project.order).padStart(2, "0") : "—";
   return `
     <a href="projeto.html?id=${encodeURIComponent(project.id)}" class="card-link panel p-6">
-      <div class="flex items-start justify-between gap-4 mb-3">
+      ${
+        contest
+          ? ""
+          : `<div class="flex items-start justify-between gap-4 mb-3">
         <p class="text-blue font-semibold">${escapeHtml(index)}</p>
         ${orderLabel ? `<p class="text-xs uppercase tracking-wide text-slate-500">${escapeHtml(orderLabel)}</p>` : ""}
-      </div>
+      </div>`
+      }
       <h3 class="text-xl font-semibold mb-2">${escapeHtml(project.title)}</h3>
       <p class="text-sm text-slate-500 mb-3">${escapeHtml((project.students || []).join(" · "))}</p>
       <p class="text-slate-600 text-sm line-clamp-3">${escapeHtml(project.description)}</p>
@@ -261,12 +292,18 @@ export function eventCardHtml(event) {
   const type = eventType(event.type);
   const date = formatEventDate(event.date) || "Data a definir";
   const audience = event.audience ? ` · ${event.audience}` : "";
+  const cover = event.imageUrl
+    ? `<img src="${escapeHtml(event.imageUrl)}" alt="${escapeHtml(event.title)}" class="event-cover" />`
+    : "";
   return `
-    <a href="evento.html?id=${encodeURIComponent(event.id)}" class="card-link panel p-6">
-      <span class="badge mb-4">${escapeHtml(type.label)}</span>
-      <h2 class="text-2xl font-semibold mb-2">${escapeHtml(event.title)}</h2>
-      <p class="text-sm text-slate-500 mb-3">${escapeHtml(date)}${event.location ? ` · ${escapeHtml(event.location)}` : ""}${escapeHtml(audience)}</p>
-      <p class="text-slate-600 text-sm line-clamp-3">${escapeHtml(event.description || "Abra para ver os detalhes e as inscrições.")}</p>
+    <a href="evento.html?id=${encodeURIComponent(event.id)}" class="card-link panel overflow-hidden">
+      ${cover}
+      <div class="p-6">
+        <span class="badge mb-4">${escapeHtml(type.label)}</span>
+        <h2 class="text-2xl font-semibold mb-2">${escapeHtml(event.title)}</h2>
+        <p class="text-sm text-slate-500 mb-3">${escapeHtml(date)}${event.location ? ` · ${escapeHtml(event.location)}` : ""}${escapeHtml(audience)}</p>
+        <p class="text-slate-600 text-sm line-clamp-3">${escapeHtml(event.description || "Abra para ver os detalhes e as inscrições.")}</p>
+      </div>
     </a>
   `;
 }

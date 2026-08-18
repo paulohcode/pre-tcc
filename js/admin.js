@@ -24,13 +24,16 @@ import {
   loadEvents,
   loadEvent,
   eventType,
-  CRITERIA,
+  voteCriteria,
+  lockedVoteAccess,
+  isContest,
   average,
   round1,
   allowsQrVote,
   eventPublicUrl,
   renderQrCode,
 } from "./app.js";
+import { uploadToImgbb } from "./imgbb.js";
 
 const loginSection = document.getElementById("admin-login");
 const panelSection = document.getElementById("admin-panel");
@@ -45,6 +48,58 @@ const editSaveBtn = document.getElementById("edit-save");
 
 let projectsById = new Map();
 let currentEventId = null;
+let currentEventImageUrl = "";
+let currentKind = "projetos";
+
+function bindPhotoField(inputId) {
+  const input = document.getElementById(inputId);
+  const preview = document.getElementById(`${inputId}-preview`);
+  const removeBtn = document.getElementById(`${inputId}-remove`);
+  if (!input || !preview) return;
+
+  input.addEventListener("change", () => {
+    const file = input.files[0];
+    if (!file) return;
+    preview.src = URL.createObjectURL(file);
+    preview.classList.remove("hidden");
+    if (removeBtn) removeBtn.classList.remove("hidden");
+    input.dataset.removed = "0";
+  });
+
+  removeBtn?.addEventListener("click", () => {
+    input.value = "";
+    preview.removeAttribute("src");
+    preview.classList.add("hidden");
+    removeBtn.classList.add("hidden");
+    input.dataset.removed = "1";
+  });
+}
+
+function setPhotoPreview(inputId, url) {
+  const input = document.getElementById(inputId);
+  const preview = document.getElementById(`${inputId}-preview`);
+  const removeBtn = document.getElementById(`${inputId}-remove`);
+  if (!input || !preview) return;
+  input.value = "";
+  input.dataset.removed = "0";
+  if (url) {
+    preview.src = url;
+    preview.classList.remove("hidden");
+    removeBtn?.classList.remove("hidden");
+  } else {
+    preview.removeAttribute("src");
+    preview.classList.add("hidden");
+    removeBtn?.classList.add("hidden");
+  }
+}
+
+async function imageFromField(inputId, currentUrl = "") {
+  const input = document.getElementById(inputId);
+  const file = input?.files?.[0];
+  if (file) return uploadToImgbb(file);
+  if (input?.dataset.removed === "1") return "";
+  return currentUrl;
+}
 
 function requireFirebase() {
   if (!isFirebaseConfigured()) {
@@ -54,47 +109,87 @@ function requireFirebase() {
   return getFirebase();
 }
 
-function eventFormPayload(prefix) {
-  const titleId = prefix === "new" ? "new-title" : "event-title-input";
-  const typeId = prefix === "new" ? "new-type" : "event-type-input";
-  const classId = prefix === "new" ? "new-class" : "event-class-input";
-  const dateId = prefix === "new" ? "new-date" : "event-date-input";
-  const timeId = prefix === "new" ? "new-time" : "event-time-input";
-  const locationId = prefix === "new" ? "new-location" : "event-location-input";
-  const descriptionId = prefix === "new" ? "new-description" : "event-description-input";
-  const audienceId = prefix === "new" ? "new-audience" : "event-audience-input";
-  const voteAccessId = prefix === "new" ? "new-vote-access" : "event-vote-access-input";
+function setAdminTab(kind, { updateUrl = true } = {}) {
+  currentKind = kind === "concurso" ? "concurso" : "projetos";
+  document.querySelectorAll("[data-admin-tab]").forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.adminTab === currentKind);
+  });
+  document.getElementById("tab-projetos").classList.toggle("hidden", currentKind !== "projetos");
+  document.getElementById("tab-concurso").classList.toggle("hidden", currentKind !== "concurso");
+  if (updateUrl && !currentEventId) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("tipo", currentKind);
+    window.history.replaceState({}, "", url);
+  }
+}
+
+function payloadFromCreateForm(form, type) {
+  const data = new FormData(form);
   return {
-    title: document.getElementById(titleId).value.trim(),
-    type: document.getElementById(typeId).value,
-    className: document.getElementById(classId).value.trim(),
-    date: document.getElementById(dateId).value,
-    time: document.getElementById(timeId).value,
-    location: document.getElementById(locationId).value.trim(),
-    description: document.getElementById(descriptionId).value.trim(),
-    audience: document.getElementById(audienceId).value.trim(),
-    voteAccess: document.getElementById(voteAccessId).value,
+    title: String(data.get("title") || "").trim(),
+    type,
+    className: String(data.get("className") || "").trim(),
+    date: String(data.get("date") || ""),
+    time: String(data.get("time") || ""),
+    location: String(data.get("location") || "").trim(),
+    description: String(data.get("description") || "").trim(),
+    audience: String(data.get("audience") || "").trim(),
+    voteAccess: lockedVoteAccess(type),
+  };
+}
+
+function eventFormPayload() {
+  const type = document.getElementById("event-type-input").value || "projetos";
+  return {
+    title: document.getElementById("event-title-input").value.trim(),
+    type,
+    className: document.getElementById("event-class-input").value.trim(),
+    date: document.getElementById("event-date-input").value,
+    time: document.getElementById("event-time-input").value,
+    location: document.getElementById("event-location-input").value.trim(),
+    description: document.getElementById("event-description-input").value.trim(),
+    audience: document.getElementById("event-audience-input").value.trim(),
+    voteAccess: lockedVoteAccess(type),
   };
 }
 
 function fillEventForm(event) {
+  const type = eventType(event.type);
+  const contest = isContest(event);
   document.getElementById("event-id").value = event.id;
-  document.getElementById("event-title-input").value = event.title || "";
   document.getElementById("event-type-input").value = event.type || "projetos";
+  document.getElementById("event-title-input").value = event.title || "";
   document.getElementById("event-class-input").value = event.className || "";
   document.getElementById("event-date-input").value = event.date || "";
   document.getElementById("event-time-input").value = event.time || "";
   document.getElementById("event-location-input").value = event.location || "";
   document.getElementById("event-description-input").value = event.description || "";
   document.getElementById("event-audience-input").value = event.audience || "";
-  document.getElementById("event-vote-access-input").value = event.voteAccess || "alunos";
+  document.getElementById("event-detail-heading").textContent = contest ? "Dados do concurso" : "Dados do evento de projetos";
+  document.getElementById("event-type-label").textContent = contest
+    ? "Tipo: concurso. Inscrições de trabalhos e ranking por nota popular."
+    : "Tipo: projetos. Inscrições de equipes, sorteio da ordem e avaliação por critérios.";
+  document.getElementById("vote-access-locked").textContent = contest
+    ? "Votação: público pelo celular (QR Code)."
+    : "Votação: somente alunos inscritos (nome da lista + PIN).";
+  document.getElementById("event-class-wrap").classList.toggle("hidden", contest);
+  document.getElementById("event-audience-wrap").classList.toggle("hidden", !contest);
+  document.getElementById("draw-panel").classList.toggle("hidden", contest);
+  document.getElementById("btn-back-events").textContent = contest ? "← Concursos" : "← Eventos de projetos";
+  document.getElementById("admin-entries-help").textContent = contest
+    ? "Trabalhos inscritos neste concurso."
+    : "Projetos cadastrados neste evento.";
+  document.getElementById("ranking-members-head").textContent = type.membersLabel;
+  const scoreHead = document.getElementById("ranking-score-head");
+  if (scoreHead) scoreHead.textContent = contest ? "Nota" : "Média";
+  currentEventImageUrl = event.imageUrl || "";
+  setPhotoPreview("event-image", currentEventImageUrl);
   document.getElementById("event-view-public").href = `evento.html?id=${encodeURIComponent(event.id)}`;
   document.getElementById("draw-status").textContent = event.orderDrawnAt
     ? "Ordem já sorteada. Você pode sortear de novo se precisar."
     : "Ainda não sorteada.";
   document.getElementById("voting-status").textContent = event.votingOpen ? "Aberta" : "Fechada";
   document.getElementById("btn-votacao").textContent = event.votingOpen ? "Fechar votação" : "Abrir votação";
-  const type = eventType(event.type);
   document.getElementById("admin-entries-title").textContent = type.plural.charAt(0).toUpperCase() + type.plural.slice(1);
   renderEventQr(event);
 }
@@ -120,21 +215,24 @@ function showList() {
   currentEventId = null;
   const url = new URL(window.location.href);
   url.searchParams.delete("evento");
+  url.searchParams.set("tipo", currentKind);
   window.history.replaceState({}, "", url);
+  document.getElementById("admin-tabs").classList.remove("hidden");
   listView.classList.remove("hidden");
   detailView.classList.add("hidden");
+  setAdminTab(currentKind, { updateUrl: false });
 }
 
 function showDetail() {
+  document.getElementById("admin-tabs").classList.add("hidden");
   listView.classList.add("hidden");
   detailView.classList.remove("hidden");
 }
 
-async function loadEventList() {
-  const root = document.getElementById("admin-events");
-  const events = await loadEvents();
+function renderKindList(rootId, events) {
+  const root = document.getElementById(rootId);
   if (!events.length) {
-    root.innerHTML = '<p class="text-slate-500 text-sm">Nenhum evento cadastrado.</p>';
+    root.innerHTML = `<p class="text-slate-500 text-sm">Nenhum cadastro nesta área.</p>`;
     return;
   }
   root.innerHTML = events
@@ -142,9 +240,16 @@ async function loadEventList() {
       const type = eventType(event.type);
       return `
         <div class="panel p-4 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p class="font-semibold">${escapeHtml(event.title)}</p>
-            <p class="text-sm text-slate-500">${escapeHtml(type.label)}${event.date ? ` · ${escapeHtml(event.date)}` : ""}</p>
+          <div class="flex items-center gap-3 min-w-0">
+            ${
+              event.imageUrl
+                ? `<img src="${escapeHtml(event.imageUrl)}" alt="" class="event-thumb" />`
+                : ""
+            }
+            <div class="min-w-0">
+              <p class="font-semibold">${escapeHtml(event.title)}</p>
+              <p class="text-sm text-slate-500">${escapeHtml(type.label)}${event.date ? ` · ${escapeHtml(event.date)}` : ""}</p>
+            </div>
           </div>
           <div class="flex gap-3">
             <button type="button" data-open="${escapeHtml(event.id)}" class="text-sm text-blue hover:underline">Gerenciar</button>
@@ -161,6 +266,18 @@ async function loadEventList() {
   root.querySelectorAll("[data-delete-event]").forEach((btn) => {
     btn.addEventListener("click", () => deleteEvent(btn.dataset.deleteEvent));
   });
+}
+
+async function loadEventList() {
+  const events = await loadEvents();
+  renderKindList(
+    "admin-events-projetos",
+    events.filter((event) => event.type !== "concurso")
+  );
+  renderKindList(
+    "admin-events-concurso",
+    events.filter((event) => event.type === "concurso")
+  );
 }
 
 async function deleteEvent(id) {
@@ -186,8 +303,10 @@ async function openEvent(id) {
     return;
   }
   currentEventId = id;
+  currentKind = event.type === "concurso" ? "concurso" : "projetos";
   const url = new URL(window.location.href);
   url.searchParams.set("evento", id);
+  url.searchParams.set("tipo", currentKind);
   window.history.replaceState({}, "", url);
   fillEventForm(event);
   showDetail();
@@ -210,7 +329,7 @@ async function loadAdminData() {
   const projects = projectsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
   const votes = votesSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
   renderProjects(projects, event);
-  renderRanking(projects, votes);
+  renderRanking(projects, votes, event);
 }
 
 function editStudentRow(name = "", canRemove = false) {
@@ -258,6 +377,9 @@ function closeEdit() {
 }
 
 function openEdit(project) {
+  const type = eventType(document.getElementById("event-type-input").value);
+  document.getElementById("edit-members-label").textContent = type.membersLabel;
+  document.getElementById("edit-add-student").textContent = type.addMember;
   document.getElementById("edit-project-id").value = project.id;
   document.getElementById("edit-title").value = project.title || "";
   document.getElementById("edit-description").value = project.description || "";
@@ -294,8 +416,8 @@ function renderProjects(projects, event) {
         <div class="border border-slate-200 px-4 py-4">
           <div class="flex flex-wrap items-start justify-between gap-3">
             <div class="min-w-0 flex-1">
-              <p class="font-medium">${project.order ? `${escapeHtml(formatOrder(project.order))} · ` : ""}${escapeHtml(project.title)}</p>
-              <p class="text-sm text-slate-500 mt-1">${escapeHtml((project.students || []).join(" · ") || "Sem integrantes")}</p>
+              <p class="font-medium">${!isContest(event) && project.order ? `${escapeHtml(formatOrder(project.order))} · ` : ""}${escapeHtml(project.title)}</p>
+              <p class="text-sm text-slate-500 mt-1">${escapeHtml((project.students || []).join(" · ") || `Sem ${type.membersLabel.toLowerCase()}`)}</p>
             </div>
             <div class="flex items-center gap-3 shrink-0">
               <button type="button" data-edit="${escapeHtml(project.id)}" class="text-sm text-blue hover:underline">Editar</button>
@@ -329,18 +451,19 @@ function renderProjects(projects, event) {
   });
 }
 
-function renderRanking(projects, votes) {
+function renderRanking(projects, votes, event) {
   const byProject = new Map(projects.map((p) => [p.id, []]));
   votes.forEach((vote) => {
     if (!byProject.has(vote.projectId)) byProject.set(vote.projectId, []);
     byProject.get(vote.projectId).push(vote);
   });
+  const criteria = voteCriteria(event);
 
   const rows = projects
     .map((project) => {
       const list = byProject.get(project.id) || [];
       const avg = list.length ? average(list.map((v) => Number(v.average) || 0)) : 0;
-      const criteriaAvgs = CRITERIA.map((c) => {
+      const criteriaAvgs = criteria.map((c) => {
         const values = list.map((v) => Number(v.criteria?.[c.id]) || 0);
         return { id: c.id, label: c.label, avg: list.length ? average(values) : 0 };
       });
@@ -364,7 +487,7 @@ function renderRanking(projects, votes) {
           <td class="py-3 pr-3">${index + 1}º</td>
           <td class="py-3 pr-3">
             <p>${escapeHtml(row.project.title)}</p>
-            <p class="text-xs text-slate-400">${row.criteriaAvgs.map((c) => `${c.label}: ${round1(c.avg).toFixed(1)}`).join(" · ")}</p>
+            <p class="text-xs text-slate-400">${row.criteriaAvgs.length > 1 ? row.criteriaAvgs.map((c) => `${c.label}: ${round1(c.avg).toFixed(1)}`).join(" · ") : ""}</p>
           </td>
           <td class="py-3 pr-3 text-slate-500">${escapeHtml((row.project.students || []).join(", "))}</td>
           <td class="py-3 pr-3 text-blue font-semibold">${row.count ? round1(row.avg).toFixed(1) : "—"}</td>
@@ -396,42 +519,63 @@ document.getElementById("admin-logout").addEventListener("click", async () => {
   if (firebase) await signOut(firebase.auth);
 });
 
-document.getElementById("form-novo-evento").addEventListener("submit", async (event) => {
+document.getElementById("form-new-projetos").addEventListener("submit", (event) => submitNewEvent(event, "projetos"));
+document.getElementById("form-new-concurso").addEventListener("submit", (event) => submitNewEvent(event, "concurso"));
+
+async function submitNewEvent(event, type) {
   event.preventDefault();
   const firebase = getFirebase();
-  const payload = eventFormPayload("new");
+  const payload = payloadFromCreateForm(event.target, type);
+  const submitBtn = event.target.querySelector("button[type=submit]");
   if (!payload.title) {
-    showToast("Informe o nome do evento.", "error");
+    showToast(type === "concurso" ? "Informe o nome do concurso." : "Informe o nome do evento.", "error");
     return;
   }
+  submitBtn.disabled = true;
   try {
+    payload.imageUrl = await imageFromField(type === "concurso" ? "new-concurso-image" : "new-projetos-image");
     const ref = await addDoc(collection(firebase.db, "events"), {
       ...payload,
       votingOpen: false,
       orderDrawnAt: null,
       createdAt: serverTimestamp(),
     });
-    showToast("Evento publicado.");
+    showToast(type === "concurso" ? "Concurso publicado." : "Evento publicado.");
     event.target.reset();
+    setPhotoPreview(type === "concurso" ? "new-concurso-image" : "new-projetos-image", "");
     await openEvent(ref.id);
   } catch (error) {
     console.error(error);
-    showToast("Não foi possível cadastrar o evento. Publique as regras do Firestore.", "error");
+    showToast(error.message || "Não foi possível cadastrar. Publique as regras do Firestore.", "error");
+  } finally {
+    submitBtn.disabled = false;
   }
-});
+}
 
 document.getElementById("form-evento").addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!currentEventId) return;
   const firebase = getFirebase();
-  const payload = eventFormPayload("edit");
+  const payload = eventFormPayload();
+  const submitBtn = event.target.querySelector("button[type=submit]");
   if (!payload.title) {
     showToast("Informe o nome do evento.", "error");
     return;
   }
-  await updateDoc(doc(firebase.db, "events", currentEventId), payload);
-  showToast("Evento salvo.");
-  await loadAdminData();
+  submitBtn.disabled = true;
+  try {
+    payload.imageUrl = await imageFromField("event-image", currentEventImageUrl);
+    await updateDoc(doc(firebase.db, "events", currentEventId), payload);
+    currentEventImageUrl = payload.imageUrl;
+    setPhotoPreview("event-image", currentEventImageUrl);
+    showToast("Evento salvo.");
+    await loadAdminData();
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "Não foi possível salvar o evento.", "error");
+  } finally {
+    submitBtn.disabled = false;
+  }
 });
 
 document.getElementById("btn-back-events").addEventListener("click", async () => {
@@ -504,6 +648,17 @@ document.getElementById("form-edit-projeto").addEventListener("submit", async (e
   }
 });
 
+bindPhotoField("new-projetos-image");
+bindPhotoField("new-concurso-image");
+bindPhotoField("event-image");
+
+document.querySelectorAll("[data-admin-tab]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    if (currentEventId) return;
+    setAdminTab(btn.dataset.adminTab);
+  });
+});
+
 const firebase = requireFirebase();
 if (firebase) {
   onAuthStateChanged(firebase.auth, async (user) => {
@@ -511,7 +666,10 @@ if (firebase) {
       loginSection.classList.add("hidden");
       panelSection.classList.remove("hidden");
       try {
-        const requested = new URLSearchParams(window.location.search).get("evento");
+        const params = new URLSearchParams(window.location.search);
+        const requested = params.get("evento");
+        const requestedKind = params.get("tipo");
+        if (requestedKind) setAdminTab(requestedKind, { updateUrl: false });
         await loadEventList();
         if (requested) await openEvent(requested);
       } catch (error) {

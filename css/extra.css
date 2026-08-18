@@ -122,9 +122,25 @@ body {
   box-shadow: 0 0 0 3px rgba(0, 61, 165, 0.12);
 }
 
+.admin-tab {
+  border: 1px solid #d5deea;
+  background: #fff;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0.7rem 1.1rem;
+}
+
+.admin-tab.is-active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+
 .card-link {
   display: block;
   transition: transform 0.18s ease, box-shadow 0.18s ease;
+  overflow: hidden;
 }
 
 .card-link:hover {
@@ -197,4 +213,33 @@ input[type="range"]::-moz-range-thumb {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.photo-preview,
+.event-cover {
+  display: block;
+  width: 100%;
+  object-fit: cover;
+  background: #e8f1fb;
+}
+
+.photo-preview {
+  max-height: 220px;
+  border: 1px solid #dbe4f0;
+}
+
+.event-cover {
+  height: 180px;
+}
+
+.event-cover-hero {
+  height: 280px;
+}
+
+.event-thumb {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #e8f1fb;
 }

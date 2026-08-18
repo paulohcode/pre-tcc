@@ -53,14 +53,26 @@
       <p class="kicker mb-3">SESI SENAI Umuarama</p>
       <h1 class="text-4xl md:text-5xl font-semibold mb-3">Eventos</h1>
       <p class="text-slate-600 max-w-2xl mb-10">
-        Confira as bancas, concursos e apresentações. Entre no evento para ver os projetos ou trabalhos inscritos e participar da votação.
+        Bancas de projetos e concursos abertos ao público. Entre no evento para ver as inscrições e participar da votação.
       </p>
 
-      <div id="events-loading" class="text-slate-500">Carregando eventos…</div>
-      <div id="events-empty" class="hidden panel p-10 text-center text-slate-500">
-        Nenhum evento cadastrado ainda. A área interna do professor cria os eventos.
-      </div>
-      <div id="events-grid" class="grid md:grid-cols-2 gap-5"></div>
+      <section class="mb-14">
+        <h2 class="text-2xl font-semibold mb-4">Eventos de projetos</h2>
+        <div id="events-loading-projetos" class="text-slate-500">Carregando…</div>
+        <div id="events-empty-projetos" class="hidden panel p-10 text-center text-slate-500">
+          Nenhum evento de projetos cadastrado.
+        </div>
+        <div id="events-grid-projetos" class="grid md:grid-cols-2 gap-5"></div>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-4">Concursos</h2>
+        <div id="events-loading-concurso" class="text-slate-500">Carregando…</div>
+        <div id="events-empty-concurso" class="hidden panel p-10 text-center text-slate-500">
+          Nenhum concurso cadastrado.
+        </div>
+        <div id="events-grid-concurso" class="grid md:grid-cols-2 gap-5"></div>
+      </section>
     </main>
 
     <footer class="site-footer py-8 text-center text-sm">

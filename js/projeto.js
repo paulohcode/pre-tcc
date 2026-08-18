@@ -15,7 +15,7 @@ import {
   formatOrder,
   loadEvent,
   eventType,
-  CRITERIA,
+  voteCriteria,
   average,
   round1,
   showToast,
@@ -66,7 +66,8 @@ function uniqueStudentNames(projects) {
 }
 
 function renderCriteria() {
-  criteriaFields.innerHTML = CRITERIA.map(
+  const items = voteCriteria(currentEvent);
+  criteriaFields.innerHTML = items.map(
     (item) => `
       <label class="block">
         <div class="flex items-center justify-between text-sm mb-2">
@@ -96,7 +97,10 @@ function currentScores() {
 }
 
 function updatePreview() {
-  votePreview.textContent = round1(average(Object.values(currentScores()))).toFixed(1);
+  const scores = Object.values(currentScores());
+  const label = scores.length === 1 ? "Nota deste voto" : "Média deste voto";
+  document.getElementById("vote-preview-label").textContent = `${label}:`;
+  votePreview.textContent = round1(average(scores)).toFixed(1);
 }
 
 function currentVoterName() {
@@ -170,11 +174,12 @@ async function loadPage() {
   const type = eventType(currentEvent?.type);
 
   document.title = `${currentProject.title} — SESI SENAI Umuarama`;
-  document.getElementById("projeto-order").textContent = formatOrder(currentProject.order);
+  document.getElementById("projeto-order").textContent = currentEvent?.type === "concurso" ? "" : formatOrder(currentProject.order);
   document.getElementById("projeto-title").textContent = currentProject.title;
   document.getElementById("projeto-students").textContent = (currentProject.students || []).join(" · ");
   document.getElementById("projeto-description").textContent = currentProject.description;
   document.getElementById("vote-title").textContent = type.vote;
+  document.getElementById("vote-help").textContent = type.voteHelp;
   if (currentEvent) {
     document.getElementById("back-evento").href = `evento.html?id=${encodeURIComponent(currentEvent.id)}`;
   }

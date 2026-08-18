@@ -62,7 +62,7 @@
         <aside class="panel p-8 h-fit">
           <p class="kicker mb-2">Votação</p>
           <h2 id="vote-title" class="text-2xl font-semibold mb-1">Avaliar</h2>
-          <p class="text-sm text-slate-500 mb-6">Notas de 0 a 10 em cada critério. A média entra no ranking do evento.</p>
+          <p id="vote-help" class="text-sm text-slate-500 mb-6">Notas de 0 a 10 em cada critério. A média entra no ranking do evento.</p>
 
           <div id="vote-closed" class="hidden text-slate-600 text-sm border border-slate-200 p-4">
             A votação ainda não foi aberta.
@@ -98,7 +98,7 @@
           <form id="form-voto" class="hidden space-y-5">
             <p id="voter-session" class="text-sm text-slate-500"></p>
             <div id="criteria-fields" class="space-y-5"></div>
-            <p class="text-sm">Média deste voto: <span id="vote-preview" class="text-blue font-semibold">5.0</span></p>
+            <p class="text-sm"><span id="vote-preview-label">Média deste voto:</span> <span id="vote-preview" class="text-blue font-semibold">5.0</span></p>
             <button type="submit" id="submit-voto" class="btn-primary w-full py-3 disabled:opacity-50">Enviar voto</button>
             <button type="button" id="logout-aluno" class="w-full text-sm text-slate-500 hover:text-slate-800">Trocar de votante</button>
           </form>
