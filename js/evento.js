@@ -55,6 +55,7 @@ async function loadPage() {
   const full = eventCoverSrc(event, "full");
   const card = eventCoverSrc(event, "card");
   if (full) {
+    cover.referrerPolicy = "no-referrer";
     cover.src = full;
     cover.alt = event.title;
     if (card && card !== full) {

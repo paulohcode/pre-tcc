@@ -292,8 +292,13 @@ export function homeBannerAssets(config = {}) {
 export async function loadSiteConfig() {
   const firebase = getFirebase();
   if (!firebase) return normalizeSiteConfig();
-  const snap = await getDoc(doc(firebase.db, "config", "site"));
-  return normalizeSiteConfig(snap.exists() ? snap.data() : {});
+  try {
+    const snap = await getDoc(doc(firebase.db, "config", "site"));
+    return normalizeSiteConfig(snap.exists() ? snap.data() : {});
+  } catch (error) {
+    console.error(error);
+    return normalizeSiteConfig();
+  }
 }
 
 export async function loadEvents() {
@@ -332,7 +337,7 @@ export function eventCoverHtml(event, className, size = "card") {
   if (!src) return "";
   const sizes = size === "card" ? "(max-width: 768px) 100vw, 560px" : "(max-width: 768px) 100vw, 1152px";
   const srcset = card && full && card !== full ? `${escapeHtml(card)} 960w, ${escapeHtml(full)} 1920w` : "";
-  return `<img src="${escapeHtml(src)}"${srcset ? ` srcset="${srcset}" sizes="${sizes}"` : ""} alt="${escapeHtml(event.title)}" class="${className}" />`;
+  return `<img src="${escapeHtml(src)}"${srcset ? ` srcset="${srcset}" sizes="${sizes}"` : ""} alt="${escapeHtml(event.title)}" class="${className}" referrerpolicy="no-referrer" />`;
 }
 
 export function eventCardHtml(event) {

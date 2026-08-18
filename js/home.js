@@ -24,15 +24,15 @@ function applyHomeBanner(config) {
   const img = document.getElementById("home-banner");
   if (!img) return;
   const banner = homeBannerAssets(config);
-  img.src = banner.src;
+  img.referrerPolicy = "no-referrer";
   img.alt = banner.alt;
-  if (banner.custom) {
-    img.srcset = `${banner.cardSrc} 990w, ${banner.src} 1980w`;
-    img.sizes = "100vw";
-  } else {
-    img.removeAttribute("srcset");
-    img.removeAttribute("sizes");
-  }
+  img.removeAttribute("srcset");
+  img.removeAttribute("sizes");
+  img.onerror = () => {
+    img.onerror = null;
+    if (banner.custom) img.src = "uploads/banner.png";
+  };
+  img.src = banner.src;
 }
 
 async function loadHome() {

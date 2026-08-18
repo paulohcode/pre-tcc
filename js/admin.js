@@ -538,7 +538,11 @@ document.getElementById("form-home-banner").addEventListener("submit", async (ev
       bannerAlt,
     });
     showToast("Banner da página principal salvo.");
-    await loadHomeBannerForm();
+    fillHomeBannerForm({
+      bannerUrl: images.imageUrl || "",
+      bannerCardUrl: images.imageCardUrl || "",
+      bannerAlt,
+    });
   } catch (error) {
     console.error(error);
     showToast(error.message || "Não foi possível salvar o banner.", "error");

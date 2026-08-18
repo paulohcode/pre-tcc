@@ -65,16 +65,29 @@ function canvasToJpeg(canvas, name, quality) {
   });
 }
 
+function pickImgbbUrl(data = {}) {
+  const candidates = [data.image?.url, data.display_url, data.medium?.url, data.url]
+    .map((url) => String(url || "").trim())
+    .filter((url) => /^https?:\/\//i.test(url));
+  return (
+    candidates.find((url) => url.includes("i.ibb.co")) ||
+    candidates.find((url) => /\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(url)) ||
+    candidates.find((url) => !url.includes("ibb.co/")) ||
+    candidates[0] ||
+    ""
+  );
+}
+
 async function postToImgbb(file) {
   const body = new FormData();
   body.append("key", imgbbApiKey);
-  body.append("image", file);
+  body.append("image", file, file.name || "image.jpg");
   const response = await fetch("https://api.imgbb.com/1/upload", {
     method: "POST",
     body,
   });
   const json = await response.json().catch(() => ({}));
-  const url = json?.data?.display_url || json?.data?.url;
+  const url = pickImgbbUrl(json?.data);
   if (!response.ok || !json?.success || !url) {
     throw new Error(json?.error?.message || "Não foi possível enviar a imagem.");
   }
@@ -122,6 +135,7 @@ export function bindPhotoField(inputId, options = {}) {
   input.addEventListener("change", () => {
     const file = input.files[0];
     if (!file) return;
+    preview.referrerPolicy = "no-referrer";
     preview.src = URL.createObjectURL(file);
     preview.classList.remove("hidden");
     if (removeBtn) removeBtn.classList.remove("hidden");
@@ -146,6 +160,7 @@ export function setPhotoPreview(inputId, url) {
   if (!input || !preview) return;
   input.value = "";
   input.dataset.removed = "0";
+  preview.referrerPolicy = "no-referrer";
   if (url) {
     preview.src = url;
     preview.classList.remove("hidden");
