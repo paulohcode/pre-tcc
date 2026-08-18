@@ -10,6 +10,7 @@ import {
   loadEvent,
   eventType,
 } from "./app.js";
+import { bindPhotoField, imageFromField } from "./imgbb.js";
 
 const params = new URLSearchParams(window.location.search);
 const eventId = params.get("evento");
@@ -88,6 +89,7 @@ async function setup() {
 
 list.appendChild(studentRow(false));
 addBtn.addEventListener("click", () => list.appendChild(studentRow(true)));
+bindPhotoField("project-image");
 setup().catch((error) => {
   console.error(error);
   form.classList.add("hidden");
@@ -124,6 +126,7 @@ form.addEventListener("submit", async (event) => {
 
   submitBtn.disabled = true;
   try {
+    const images = await imageFromField("project-image");
     await addDoc(collection(firebase.db, "projects"), {
       eventId,
       title,
@@ -131,6 +134,7 @@ form.addEventListener("submit", async (event) => {
       students,
       order: null,
       createdAt: serverTimestamp(),
+      ...images,
     });
     showToast("Inscrição publicada.");
     window.location.href = `evento.html?id=${encodeURIComponent(eventId)}`;

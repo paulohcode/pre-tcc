@@ -302,6 +302,13 @@
                 <label for="edit-description" class="block text-sm mb-2">Descrição</label>
                 <textarea id="edit-description" required rows="5" maxlength="2000" class="field resize-y"></textarea>
               </div>
+              <div>
+                <label for="edit-project-image" class="block text-sm mb-2">Foto</label>
+                <input id="edit-project-image" type="file" accept="image/*" class="field" />
+                <p class="text-xs text-slate-500 mt-2">Padrão 16:9 (1920×1080). O card usa uma versão menor gerada automaticamente.</p>
+                <img id="edit-project-image-preview" alt="Prévia da foto" class="photo-preview hidden mt-3" />
+                <button type="button" id="edit-project-image-remove" class="hidden mt-2 text-sm text-red-600 hover:underline">Excluir imagem</button>
+              </div>
               <div class="flex flex-wrap items-center gap-4">
                 <button type="submit" id="edit-save" class="btn-primary px-5 py-3 disabled:opacity-50">Salvar alterações</button>
                 <a id="edit-view-public" href="index.html" class="text-sm text-slate-500 hover:text-slate-800">Ver página pública</a>

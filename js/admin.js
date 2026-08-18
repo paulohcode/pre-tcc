@@ -33,7 +33,7 @@ import {
   eventPublicUrl,
   renderQrCode,
 } from "./app.js";
-import { uploadToImgbb } from "./imgbb.js";
+import { bindPhotoField, setPhotoPreview, imageFromField, emptyImages } from "./imgbb.js";
 
 const loginSection = document.getElementById("admin-login");
 const panelSection = document.getElementById("admin-panel");
@@ -48,74 +48,9 @@ const editSaveBtn = document.getElementById("edit-save");
 
 let projectsById = new Map();
 let currentEventId = null;
-let currentEventImages = { imageUrl: "", imageCardUrl: "" };
+let currentEventImages = emptyImages();
+let currentProjectImages = emptyImages();
 let currentKind = "projetos";
-
-function bindPhotoField(inputId) {
-  const input = document.getElementById(inputId);
-  const preview = document.getElementById(`${inputId}-preview`);
-  const removeBtn = document.getElementById(`${inputId}-remove`);
-  if (!input || !preview) return;
-
-  input.addEventListener("change", () => {
-    const file = input.files[0];
-    if (!file) return;
-    preview.src = URL.createObjectURL(file);
-    preview.classList.remove("hidden");
-    if (removeBtn) removeBtn.classList.remove("hidden");
-    input.dataset.removed = "0";
-  });
-
-  removeBtn?.addEventListener("click", async () => {
-    const hadSavedImage = inputId === "event-image" && Boolean(currentEventId && currentEventImages.imageUrl);
-    if (hadSavedImage && !confirm("Excluir a imagem deste evento?")) return;
-
-    input.value = "";
-    preview.removeAttribute("src");
-    preview.classList.add("hidden");
-    removeBtn.classList.add("hidden");
-    input.dataset.removed = "1";
-
-    if (!hadSavedImage) return;
-    try {
-      await updateDoc(doc(getFirebase().db, "events", currentEventId), { imageUrl: "", imageCardUrl: "" });
-      currentEventImages = { imageUrl: "", imageCardUrl: "" };
-      showToast("Imagem excluída.");
-    } catch (error) {
-      console.error(error);
-      showToast("Não foi possível excluir a imagem.", "error");
-    }
-  });
-}
-
-function setPhotoPreview(inputId, url) {
-  const input = document.getElementById(inputId);
-  const preview = document.getElementById(`${inputId}-preview`);
-  const removeBtn = document.getElementById(`${inputId}-remove`);
-  if (!input || !preview) return;
-  input.value = "";
-  input.dataset.removed = "0";
-  if (url) {
-    preview.src = url;
-    preview.classList.remove("hidden");
-    removeBtn?.classList.remove("hidden");
-  } else {
-    preview.removeAttribute("src");
-    preview.classList.add("hidden");
-    removeBtn?.classList.add("hidden");
-  }
-}
-
-async function imageFromField(inputId, current = { imageUrl: "", imageCardUrl: "" }) {
-  const input = document.getElementById(inputId);
-  const file = input?.files?.[0];
-  if (file) return uploadToImgbb(file);
-  if (input?.dataset.removed === "1") return { imageUrl: "", imageCardUrl: "" };
-  return {
-    imageUrl: current.imageUrl || "",
-    imageCardUrl: current.imageCardUrl || current.imageUrl || "",
-  };
-}
 
 function requireFirebase() {
   if (!isFirebaseConfigured()) {
@@ -393,6 +328,8 @@ function closeEdit() {
   document.getElementById("edit-project-id").value = "";
   document.getElementById("form-edit-projeto").reset();
   editStudentsList.innerHTML = "";
+  currentProjectImages = emptyImages();
+  setPhotoPreview("edit-project-image", "");
 }
 
 function openEdit(project) {
@@ -403,6 +340,11 @@ function openEdit(project) {
   document.getElementById("edit-title").value = project.title || "";
   document.getElementById("edit-description").value = project.description || "";
   document.getElementById("edit-view-public").href = `projeto.html?id=${encodeURIComponent(project.id)}`;
+  currentProjectImages = {
+    imageUrl: project.imageUrl || "",
+    imageCardUrl: project.imageCardUrl || project.imageUrl || "",
+  };
+  setPhotoPreview("edit-project-image", currentProjectImages.imageUrl);
   const students = (project.students || []).map((name) => String(name).trim()).filter(Boolean);
   editStudentsList.innerHTML = "";
   (students.length ? students : [""]).forEach((name, index, list) => {
@@ -434,9 +376,16 @@ function renderProjects(projects, event) {
       (project) => `
         <div class="border border-slate-200 px-4 py-4">
           <div class="flex flex-wrap items-start justify-between gap-3">
-            <div class="min-w-0 flex-1">
-              <p class="font-medium">${!isContest(event) && project.order ? `${escapeHtml(formatOrder(project.order))} · ` : ""}${escapeHtml(project.title)}</p>
-              <p class="text-sm text-slate-500 mt-1">${escapeHtml((project.students || []).join(" · ") || `Sem ${type.membersLabel.toLowerCase()}`)}</p>
+            <div class="flex items-start gap-3 min-w-0 flex-1">
+              ${
+                project.imageUrl
+                  ? `<img src="${escapeHtml(project.imageCardUrl || project.imageUrl)}" alt="" class="event-thumb" />`
+                  : ""
+              }
+              <div class="min-w-0">
+                <p class="font-medium">${!isContest(event) && project.order ? `${escapeHtml(formatOrder(project.order))} · ` : ""}${escapeHtml(project.title)}</p>
+                <p class="text-sm text-slate-500 mt-1">${escapeHtml((project.students || []).join(" · ") || `Sem ${type.membersLabel.toLowerCase()}`)}</p>
+              </div>
             </div>
             <div class="flex items-center gap-3 shrink-0">
               <button type="button" data-edit="${escapeHtml(project.id)}" class="text-sm text-blue hover:underline">Editar</button>
@@ -658,7 +607,13 @@ document.getElementById("form-edit-projeto").addEventListener("submit", async (e
   }
   editSaveBtn.disabled = true;
   try {
-    await updateDoc(doc(getFirebase().db, "projects", id), { title, description, students });
+    const images = await imageFromField("edit-project-image", currentProjectImages);
+    await updateDoc(doc(getFirebase().db, "projects", id), {
+      title,
+      description,
+      students,
+      ...images,
+    });
     showToast("Inscrição atualizada.");
     closeEdit();
     await loadAdminData();
@@ -672,7 +627,47 @@ document.getElementById("form-edit-projeto").addEventListener("submit", async (e
 
 bindPhotoField("new-projetos-image");
 bindPhotoField("new-concurso-image");
-bindPhotoField("event-image");
+bindPhotoField("event-image", {
+  confirmRemove: () => {
+    if (currentEventId && currentEventImages.imageUrl) return confirm("Excluir a imagem deste evento?");
+    return true;
+  },
+  afterRemove: async () => {
+    if (!currentEventId || !currentEventImages.imageUrl) return;
+    try {
+      await updateDoc(doc(getFirebase().db, "events", currentEventId), { imageUrl: "", imageCardUrl: "" });
+      currentEventImages = emptyImages();
+      showToast("Imagem excluída.");
+    } catch (error) {
+      console.error(error);
+      showToast("Não foi possível excluir a imagem.", "error");
+    }
+  },
+});
+bindPhotoField("edit-project-image", {
+  confirmRemove: () => {
+    const id = document.getElementById("edit-project-id").value;
+    if (id && currentProjectImages.imageUrl) return confirm("Excluir a imagem desta inscrição?");
+    return true;
+  },
+  afterRemove: async () => {
+    const id = document.getElementById("edit-project-id").value;
+    if (!id || !currentProjectImages.imageUrl) return;
+    try {
+      await updateDoc(doc(getFirebase().db, "projects", id), { imageUrl: "", imageCardUrl: "" });
+      currentProjectImages = emptyImages();
+      const project = projectsById.get(id);
+      if (project) {
+        project.imageUrl = "";
+        project.imageCardUrl = "";
+      }
+      showToast("Imagem excluída.");
+    } catch (error) {
+      console.error(error);
+      showToast("Não foi possível excluir a imagem.", "error");
+    }
+  },
+});
 
 document.querySelectorAll("[data-admin-tab]").forEach((btn) => {
   btn.addEventListener("click", () => {

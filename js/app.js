@@ -178,8 +178,11 @@ export function projectCardHtml(project, event) {
   const contest = isContest(event);
   const orderLabel = contest ? "" : formatOrder(project.order);
   const index = contest ? "" : project.order ? String(project.order).padStart(2, "0") : "—";
+  const cover = eventCoverHtml(project, "event-cover", "card");
   return `
-    <a href="projeto.html?id=${encodeURIComponent(project.id)}" class="card-link panel p-6">
+    <a href="projeto.html?id=${encodeURIComponent(project.id)}" class="card-link panel overflow-hidden">
+      ${cover}
+      <div class="p-6">
       ${
         contest
           ? ""
@@ -192,6 +195,7 @@ export function projectCardHtml(project, event) {
       <p class="text-sm text-slate-500 mb-3">${escapeHtml((project.students || []).join(" · "))}</p>
       <p class="text-slate-600 text-sm line-clamp-3">${escapeHtml(project.description)}</p>
       <p class="text-blue text-sm font-medium mt-4">${escapeHtml(type.vote)} →</p>
+      </div>
     </a>
   `;
 }

@@ -21,6 +21,7 @@ import {
   showToast,
   slugifyName,
   allowsOpenName,
+  eventCoverSrc,
 } from "./app.js";
 import {
   getStudentSession,
@@ -178,6 +179,27 @@ async function loadPage() {
   document.getElementById("projeto-title").textContent = currentProject.title;
   document.getElementById("projeto-students").textContent = (currentProject.students || []).join(" · ");
   document.getElementById("projeto-description").textContent = currentProject.description;
+  const cover = document.getElementById("projeto-cover");
+  const coverWrap = document.getElementById("projeto-cover-wrap");
+  const full = eventCoverSrc(currentProject, "full");
+  const card = eventCoverSrc(currentProject, "card");
+  if (full) {
+    cover.src = full;
+    cover.alt = currentProject.title;
+    if (card && card !== full) {
+      cover.srcset = `${card} 960w, ${full} 1920w`;
+      cover.sizes = "(max-width: 768px) 100vw, 640px";
+    } else {
+      cover.removeAttribute("srcset");
+      cover.removeAttribute("sizes");
+    }
+    coverWrap.classList.remove("hidden");
+  } else {
+    cover.removeAttribute("src");
+    cover.removeAttribute("srcset");
+    cover.removeAttribute("sizes");
+    coverWrap.classList.add("hidden");
+  }
   document.getElementById("vote-title").textContent = type.vote;
   document.getElementById("vote-help").textContent = type.voteHelp;
   if (currentEvent) {

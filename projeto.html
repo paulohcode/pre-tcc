@@ -52,11 +52,16 @@
       <div id="projeto-missing" class="hidden mt-8 text-slate-500">Inscrição não encontrada.</div>
 
       <div id="projeto-content" class="hidden mt-8 grid lg:grid-cols-[1.2fr_0.8fr] gap-8">
-        <article class="panel p-8">
+        <article class="panel overflow-hidden">
+          <div id="projeto-cover-wrap" class="hidden">
+            <img id="projeto-cover" alt="" class="event-cover event-cover-hero" />
+          </div>
+          <div class="p-8">
           <p id="projeto-order" class="kicker mb-3"></p>
           <h1 id="projeto-title" class="text-4xl font-semibold mb-4"></h1>
           <p id="projeto-students" class="text-slate-600 mb-6"></p>
           <p id="projeto-description" class="text-slate-600 leading-relaxed whitespace-pre-wrap"></p>
+          </div>
         </article>
 
         <aside class="panel p-8 h-fit">

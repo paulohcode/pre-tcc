@@ -8,7 +8,7 @@ export function isImgbbConfigured() {
   return Boolean(imgbbApiKey && !String(imgbbApiKey).toLowerCase().includes("cole"));
 }
 
-function emptyImages() {
+export function emptyImages() {
   return { imageUrl: "", imageCardUrl: "" };
 }
 
@@ -90,9 +90,64 @@ export async function uploadToImgbb(file) {
 
   const source = await loadImageFile(file);
   const [fullFile, cardFile] = await Promise.all([
-    canvasToJpeg(drawBanner(source, BANNER.width, BANNER.height), "evento.jpg", 0.86),
-    canvasToJpeg(drawBanner(source, CARD.width, CARD.height), "evento-card.jpg", 0.82),
+    canvasToJpeg(drawBanner(source, BANNER.width, BANNER.height), "capa.jpg", 0.86),
+    canvasToJpeg(drawBanner(source, CARD.width, CARD.height), "capa-card.jpg", 0.82),
   ]);
   const [imageUrl, imageCardUrl] = await Promise.all([postToImgbb(fullFile), postToImgbb(cardFile)]);
   return { imageUrl, imageCardUrl };
+}
+
+export function bindPhotoField(inputId, options = {}) {
+  const input = document.getElementById(inputId);
+  const preview = document.getElementById(`${inputId}-preview`);
+  const removeBtn = document.getElementById(`${inputId}-remove`);
+  if (!input || !preview) return;
+
+  input.addEventListener("change", () => {
+    const file = input.files[0];
+    if (!file) return;
+    preview.src = URL.createObjectURL(file);
+    preview.classList.remove("hidden");
+    if (removeBtn) removeBtn.classList.remove("hidden");
+    input.dataset.removed = "0";
+  });
+
+  removeBtn?.addEventListener("click", async () => {
+    if (options.confirmRemove && !(await options.confirmRemove())) return;
+    input.value = "";
+    preview.removeAttribute("src");
+    preview.classList.add("hidden");
+    removeBtn.classList.add("hidden");
+    input.dataset.removed = "1";
+    if (options.afterRemove) await options.afterRemove();
+  });
+}
+
+export function setPhotoPreview(inputId, url) {
+  const input = document.getElementById(inputId);
+  const preview = document.getElementById(`${inputId}-preview`);
+  const removeBtn = document.getElementById(`${inputId}-remove`);
+  if (!input || !preview) return;
+  input.value = "";
+  input.dataset.removed = "0";
+  if (url) {
+    preview.src = url;
+    preview.classList.remove("hidden");
+    removeBtn?.classList.remove("hidden");
+  } else {
+    preview.removeAttribute("src");
+    preview.classList.add("hidden");
+    removeBtn?.classList.add("hidden");
+  }
+}
+
+export async function imageFromField(inputId, current = emptyImages()) {
+  const input = document.getElementById(inputId);
+  const file = input?.files?.[0];
+  if (file) return uploadToImgbb(file);
+  if (input?.dataset.removed === "1") return emptyImages();
+  return {
+    imageUrl: current.imageUrl || "",
+    imageCardUrl: current.imageCardUrl || current.imageUrl || "",
+  };
 }

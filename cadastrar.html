@@ -71,6 +71,13 @@
           <label for="description" class="block text-sm mb-2">Descrição</label>
           <textarea id="description" name="description" required rows="5" maxlength="2000" class="field resize-y" placeholder="Resumo do que será apresentado."></textarea>
         </div>
+        <div>
+          <label for="project-image" class="block text-sm mb-2">Foto</label>
+          <input id="project-image" type="file" accept="image/*" class="field" />
+          <p class="text-xs text-slate-500 mt-2">Use 16:9 (ex.: 1920×1080). JPG, PNG ou WEBP, até 5 MB. O site gera a versão do card automaticamente.</p>
+          <img id="project-image-preview" alt="Prévia da foto" class="photo-preview hidden mt-3" />
+          <button type="button" id="project-image-remove" class="hidden mt-2 text-sm text-red-600 hover:underline">Excluir imagem</button>
+        </div>
         <button type="submit" id="submit-projeto" class="btn-primary w-full py-3 disabled:opacity-50">Publicar</button>
       </form>
     </main>
