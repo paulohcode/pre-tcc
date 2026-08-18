@@ -216,30 +216,24 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .photo-preview,
-.event-cover {
+.event-cover,
+.event-cover-hero,
+.event-thumb {
   display: block;
   width: 100%;
-  object-fit: cover;
-  background: #e8f1fb;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  object-position: center;
+  background: #fff;
 }
 
 .photo-preview {
-  max-height: 220px;
   border: 1px solid #dbe4f0;
 }
 
-.event-cover {
-  height: 180px;
-}
-
-.event-cover-hero {
-  height: 280px;
-}
-
 .event-thumb {
-  width: 64px;
-  height: 64px;
-  object-fit: cover;
+  width: 96px;
   flex-shrink: 0;
   background: #e8f1fb;
 }

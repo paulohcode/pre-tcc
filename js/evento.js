@@ -11,6 +11,7 @@ import {
   eventPublicUrl,
   renderQrCode,
   isContest,
+  eventCoverSrc,
 } from "./app.js";
 
 const params = new URLSearchParams(window.location.search);
@@ -50,13 +51,25 @@ async function loadPage() {
   document.getElementById("evento-register").textContent = type.register;
   document.getElementById("evento-register").href = `cadastrar.html?evento=${encodeURIComponent(event.id)}`;
   const cover = document.getElementById("evento-cover");
-  if (event.imageUrl) {
-    cover.src = event.imageUrl;
+  const coverWrap = document.getElementById("evento-cover-wrap");
+  const full = eventCoverSrc(event, "full");
+  const card = eventCoverSrc(event, "card");
+  if (full) {
+    cover.src = full;
     cover.alt = event.title;
-    cover.classList.remove("hidden");
+    if (card && card !== full) {
+      cover.srcset = `${card} 960w, ${full} 1920w`;
+      cover.sizes = "(max-width: 768px) 100vw, 1152px";
+    } else {
+      cover.removeAttribute("srcset");
+      cover.removeAttribute("sizes");
+    }
+    coverWrap.classList.remove("hidden");
   } else {
     cover.removeAttribute("src");
-    cover.classList.add("hidden");
+    cover.removeAttribute("srcset");
+    cover.removeAttribute("sizes");
+    coverWrap.classList.add("hidden");
   }
   document.getElementById("entries-title").textContent = type.plural.charAt(0).toUpperCase() + type.plural.slice(1);
 

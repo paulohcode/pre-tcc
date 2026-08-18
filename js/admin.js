@@ -48,7 +48,7 @@ const editSaveBtn = document.getElementById("edit-save");
 
 let projectsById = new Map();
 let currentEventId = null;
-let currentEventImageUrl = "";
+let currentEventImages = { imageUrl: "", imageCardUrl: "" };
 let currentKind = "projetos";
 
 function bindPhotoField(inputId) {
@@ -66,12 +66,25 @@ function bindPhotoField(inputId) {
     input.dataset.removed = "0";
   });
 
-  removeBtn?.addEventListener("click", () => {
+  removeBtn?.addEventListener("click", async () => {
+    const hadSavedImage = inputId === "event-image" && Boolean(currentEventId && currentEventImages.imageUrl);
+    if (hadSavedImage && !confirm("Excluir a imagem deste evento?")) return;
+
     input.value = "";
     preview.removeAttribute("src");
     preview.classList.add("hidden");
     removeBtn.classList.add("hidden");
     input.dataset.removed = "1";
+
+    if (!hadSavedImage) return;
+    try {
+      await updateDoc(doc(getFirebase().db, "events", currentEventId), { imageUrl: "", imageCardUrl: "" });
+      currentEventImages = { imageUrl: "", imageCardUrl: "" };
+      showToast("Imagem excluída.");
+    } catch (error) {
+      console.error(error);
+      showToast("Não foi possível excluir a imagem.", "error");
+    }
   });
 }
 
@@ -93,12 +106,15 @@ function setPhotoPreview(inputId, url) {
   }
 }
 
-async function imageFromField(inputId, currentUrl = "") {
+async function imageFromField(inputId, current = { imageUrl: "", imageCardUrl: "" }) {
   const input = document.getElementById(inputId);
   const file = input?.files?.[0];
   if (file) return uploadToImgbb(file);
-  if (input?.dataset.removed === "1") return "";
-  return currentUrl;
+  if (input?.dataset.removed === "1") return { imageUrl: "", imageCardUrl: "" };
+  return {
+    imageUrl: current.imageUrl || "",
+    imageCardUrl: current.imageCardUrl || current.imageUrl || "",
+  };
 }
 
 function requireFirebase() {
@@ -182,8 +198,11 @@ function fillEventForm(event) {
   document.getElementById("ranking-members-head").textContent = type.membersLabel;
   const scoreHead = document.getElementById("ranking-score-head");
   if (scoreHead) scoreHead.textContent = contest ? "Nota" : "Média";
-  currentEventImageUrl = event.imageUrl || "";
-  setPhotoPreview("event-image", currentEventImageUrl);
+  currentEventImages = {
+    imageUrl: event.imageUrl || "",
+    imageCardUrl: event.imageCardUrl || event.imageUrl || "",
+  };
+  setPhotoPreview("event-image", currentEventImages.imageUrl);
   document.getElementById("event-view-public").href = `evento.html?id=${encodeURIComponent(event.id)}`;
   document.getElementById("draw-status").textContent = event.orderDrawnAt
     ? "Ordem já sorteada. Você pode sortear de novo se precisar."
@@ -243,7 +262,7 @@ function renderKindList(rootId, events) {
           <div class="flex items-center gap-3 min-w-0">
             ${
               event.imageUrl
-                ? `<img src="${escapeHtml(event.imageUrl)}" alt="" class="event-thumb" />`
+                ? `<img src="${escapeHtml(event.imageCardUrl || event.imageUrl)}" alt="" class="event-thumb" />`
                 : ""
             }
             <div class="min-w-0">
@@ -533,7 +552,7 @@ async function submitNewEvent(event, type) {
   }
   submitBtn.disabled = true;
   try {
-    payload.imageUrl = await imageFromField(type === "concurso" ? "new-concurso-image" : "new-projetos-image");
+    Object.assign(payload, await imageFromField(type === "concurso" ? "new-concurso-image" : "new-projetos-image"));
     const ref = await addDoc(collection(firebase.db, "events"), {
       ...payload,
       votingOpen: false,
@@ -564,10 +583,13 @@ document.getElementById("form-evento").addEventListener("submit", async (event) 
   }
   submitBtn.disabled = true;
   try {
-    payload.imageUrl = await imageFromField("event-image", currentEventImageUrl);
+    Object.assign(payload, await imageFromField("event-image", currentEventImages));
     await updateDoc(doc(firebase.db, "events", currentEventId), payload);
-    currentEventImageUrl = payload.imageUrl;
-    setPhotoPreview("event-image", currentEventImageUrl);
+    currentEventImages = {
+      imageUrl: payload.imageUrl || "",
+      imageCardUrl: payload.imageCardUrl || payload.imageUrl || "",
+    };
+    setPhotoPreview("event-image", currentEventImages.imageUrl);
     showToast("Evento salvo.");
     await loadAdminData();
   } catch (error) {

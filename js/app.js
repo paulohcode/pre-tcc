@@ -128,6 +128,7 @@ export function normalizeEvent(id, data = {}) {
     audience: data.audience || "",
     voteAccess: lockedVoteAccess(type),
     imageUrl: data.imageUrl || "",
+    imageCardUrl: data.imageCardUrl || data.imageUrl || "",
     votingOpen: Boolean(data.votingOpen),
     orderDrawnAt: data.orderDrawnAt || null,
     createdAt: data.createdAt || null,
@@ -288,13 +289,26 @@ export async function loadEventProjects(eventId) {
   return snap.docs.map((item) => ({ id: item.id, ...item.data() }));
 }
 
+export function eventCoverSrc(event, size = "full") {
+  if (size === "card") return event.imageCardUrl || event.imageUrl || "";
+  return event.imageUrl || event.imageCardUrl || "";
+}
+
+export function eventCoverHtml(event, className, size = "card") {
+  const full = eventCoverSrc(event, "full");
+  const card = eventCoverSrc(event, "card");
+  const src = size === "card" ? card : full;
+  if (!src) return "";
+  const sizes = size === "card" ? "(max-width: 768px) 100vw, 560px" : "(max-width: 768px) 100vw, 1152px";
+  const srcset = card && full && card !== full ? `${escapeHtml(card)} 960w, ${escapeHtml(full)} 1920w` : "";
+  return `<img src="${escapeHtml(src)}"${srcset ? ` srcset="${srcset}" sizes="${sizes}"` : ""} alt="${escapeHtml(event.title)}" class="${className}" />`;
+}
+
 export function eventCardHtml(event) {
   const type = eventType(event.type);
   const date = formatEventDate(event.date) || "Data a definir";
   const audience = event.audience ? ` · ${event.audience}` : "";
-  const cover = event.imageUrl
-    ? `<img src="${escapeHtml(event.imageUrl)}" alt="${escapeHtml(event.title)}" class="event-cover" />`
-    : "";
+  const cover = eventCoverHtml(event, "event-cover", "card");
   return `
     <a href="evento.html?id=${encodeURIComponent(event.id)}" class="card-link panel overflow-hidden">
       ${cover}
