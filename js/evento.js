@@ -101,11 +101,12 @@ async function loadPage() {
   const projects = await loadEventProjects(event.id);
   entriesLoading.classList.add("hidden");
   const orderStatus = document.getElementById("order-status");
+  const drawn = !isContest(event) && Boolean(event.orderDrawnAt);
   if (isContest(event)) {
     orderStatus.textContent = "";
   } else {
-    orderStatus.textContent = event.orderDrawnAt
-      ? "Ordem das apresentações já sorteada."
+    orderStatus.textContent = drawn
+      ? "Listadas na ordem de apresentação."
       : "A ordem ainda não foi sorteada.";
   }
 
@@ -115,6 +116,7 @@ async function loadPage() {
     return;
   }
 
+  grid.className = drawn ? "grid gap-4" : "grid md:grid-cols-2 gap-5";
   grid.innerHTML = sortProjects(projects).map((project) => projectCardHtml(project, event)).join("");
 }
 

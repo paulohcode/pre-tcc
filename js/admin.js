@@ -22,6 +22,7 @@ import {
   escapeHtml,
   formatOrder,
   shuffle,
+  sortProjects,
   loadEvents,
   loadEvent,
   eventType,
@@ -400,10 +401,7 @@ function renderProjects(projects, event) {
     return;
   }
 
-  const sorted = [...projects].sort((a, b) => {
-    if (a.order && b.order) return a.order - b.order;
-    return (a.title || "").localeCompare(b.title || "", "pt-BR");
-  });
+  const sorted = sortProjects(projects);
 
   root.innerHTML = sorted
     .map(

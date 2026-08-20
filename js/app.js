@@ -165,9 +165,16 @@ export function eventFacts(event) {
 }
 
 export function sortProjects(projects) {
-  const drawn = projects.every((p) => typeof p.order === "number" && p.order > 0);
-  if (drawn) return [...projects].sort((a, b) => a.order - b.order);
-  return [...projects].sort((a, b) => (a.title || "").localeCompare(b.title || "", "pt-BR"));
+  const withOrder = projects.filter((p) => Number(p.order) > 0);
+  if (!withOrder.length) {
+    return [...projects].sort((a, b) => (a.title || "").localeCompare(b.title || "", "pt-BR"));
+  }
+  return [...projects].sort((a, b) => {
+    const ao = Number(a.order) > 0 ? Number(a.order) : Number.POSITIVE_INFINITY;
+    const bo = Number(b.order) > 0 ? Number(b.order) : Number.POSITIVE_INFINITY;
+    if (ao !== bo) return ao - bo;
+    return (a.title || "").localeCompare(b.title || "", "pt-BR");
+  });
 }
 
 export function formatOrder(order) {
