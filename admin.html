@@ -59,7 +59,8 @@
             <label for="admin-password" class="block text-sm mb-2">Senha</label>
             <input id="admin-password" type="password" required class="field" />
           </div>
-          <button type="submit" class="btn-primary w-full py-3">Entrar</button>
+          <p id="login-error" class="hidden text-sm text-red-600"></p>
+          <button type="submit" id="btn-login" class="btn-primary w-full py-3">Entrar</button>
         </form>
       </section>
 
@@ -365,6 +366,6 @@
 
     <div id="toast-root" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
     <div class="hidden p-4 flex items-center justify-between gap-3 font-semibold text-sm text-slate-500 text-slate-400 hover:underline hover:text-red-600 border border-slate-200 px-4 py-4 min-w-0 flex-1 shrink-0 text-xs uppercase tracking-wide text-blue"></div>
-    <script type="module" src="js/admin.js"></script>
+    <script type="module" src="js/admin.js?v=login2"></script>
   </body>
 </html>

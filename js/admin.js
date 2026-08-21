@@ -74,6 +74,99 @@ function requireFirebase() {
   return getFirebase();
 }
 
+function setLoginError(message) {
+  const el = document.getElementById("login-error");
+  if (!el) {
+    if (message) showToast(message, "error");
+    return;
+  }
+  el.textContent = message || "";
+  el.classList.toggle("hidden", !message);
+}
+
+function loginErrorMessage(error) {
+  const code = String(error?.code || "");
+  if (location.protocol === "file:") {
+    return "Abra o site publicado no GitHub Pages. O login não funciona pelo arquivo local.";
+  }
+  if (code.includes("invalid-credential") || code.includes("wrong-password") || code.includes("user-not-found") || code.includes("invalid-email")) {
+    return "E-mail ou senha inválidos.";
+  }
+  if (code.includes("too-many-requests")) return "Muitas tentativas. Aguarde um pouco e tente de novo.";
+  if (code.includes("network-request-failed")) return "Sem conexão com o Firebase. Confira a internet.";
+  if (code.includes("unauthorized-domain")) return "Este endereço não está autorizado no Firebase Authentication.";
+  if (code.includes("operation-not-allowed")) return "O login por e-mail e senha está desativado no Firebase.";
+  return error?.message || "Não foi possível entrar.";
+}
+
+function showLogin() {
+  loginSection?.classList.remove("hidden");
+  panelSection?.classList.add("hidden");
+}
+
+async function enterPanel() {
+  loginSection?.classList.add("hidden");
+  panelSection?.classList.remove("hidden");
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get("evento");
+    const requestedKind = params.get("tipo");
+    if (requestedKind) setAdminTab(requestedKind, { updateUrl: false });
+    await Promise.all([loadEventList(), loadHomeBannerForm()]);
+    if (requested) await openEvent(requested);
+  } catch (error) {
+    console.error(error);
+    showToast("Não foi possível carregar o painel. Confira as regras do Firestore.", "error");
+  }
+}
+
+document.getElementById("form-login")?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  setLoginError("");
+  if (location.protocol === "file:") {
+    setLoginError("Abra o site publicado no GitHub Pages. O login não funciona pelo arquivo local.");
+    return;
+  }
+  const firebase = requireFirebase();
+  if (!firebase) return;
+  const btn = document.getElementById("btn-login");
+  if (btn) btn.disabled = true;
+  try {
+    await signInWithEmailAndPassword(
+      firebase.auth,
+      document.getElementById("admin-email").value.trim(),
+      document.getElementById("admin-password").value
+    );
+    await enterPanel();
+  } catch (error) {
+    console.error(error);
+    const message = loginErrorMessage(error);
+    setLoginError(message);
+    showToast(message, "error");
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+});
+
+try {
+  if (location.protocol === "file:") {
+    setLoginError("Abra o site publicado no GitHub Pages. O login não funciona pelo arquivo local.");
+  } else {
+    const firebase = getFirebase();
+    if (firebase) {
+      onAuthStateChanged(firebase.auth, async (user) => {
+        if (user) await enterPanel();
+        else showLogin();
+      });
+    } else {
+      setLoginError("Configure o Firebase em js/firebase-config.js.");
+    }
+  }
+} catch (error) {
+  console.error(error);
+  setLoginError("Não foi possível iniciar o Firebase. Recarregue a página.");
+}
+
 function setAdminTab(kind, { updateUrl = true } = {}) {
   currentKind = adminTabKind(kind);
   document.querySelectorAll("[data-admin-tab]").forEach((btn) => {
@@ -468,7 +561,7 @@ function renderRanking(projects, votes, event) {
   const rows = rankingRows(projects, votes, event);
   const podiumBtn = document.getElementById("btn-podio");
   const hasScores = rows.some((row) => row.count > 0);
-  podiumBtn.classList.toggle("hidden", !hasScores);
+  podiumBtn?.classList.toggle("hidden", !hasScores);
 
   if (!votes.length) {
     rankingEmpty.classList.remove("hidden");
@@ -497,30 +590,14 @@ function renderRanking(projects, votes, event) {
     .join("");
 }
 
-document.getElementById("form-login").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const firebase = requireFirebase();
-  if (!firebase) return;
-  try {
-    await signInWithEmailAndPassword(
-      firebase.auth,
-      document.getElementById("admin-email").value.trim(),
-      document.getElementById("admin-password").value
-    );
-  } catch (error) {
-    console.error(error);
-    showToast("Login inválido. Confira e-mail, senha e o Authentication no Firebase.", "error");
-  }
-});
-
-document.getElementById("admin-logout").addEventListener("click", async () => {
+document.getElementById("admin-logout")?.addEventListener("click", async () => {
   const firebase = getFirebase();
   if (firebase) await signOut(firebase.auth);
 });
 
-document.getElementById("form-new-projetos").addEventListener("submit", (event) => submitNewEvent(event, "projetos"));
-document.getElementById("form-new-concurso").addEventListener("submit", (event) => submitNewEvent(event, "concurso"));
-document.getElementById("form-home-banner").addEventListener("submit", async (event) => {
+document.getElementById("form-new-projetos")?.addEventListener("submit", (event) => submitNewEvent(event, "projetos"));
+document.getElementById("form-new-concurso")?.addEventListener("submit", (event) => submitNewEvent(event, "concurso"));
+document.getElementById("form-home-banner")?.addEventListener("submit", async (event) => {
   event.preventDefault();
   const firebase = requireFirebase();
   if (!firebase) return;
@@ -578,7 +655,7 @@ async function submitNewEvent(event, type) {
   }
 }
 
-document.getElementById("form-evento").addEventListener("submit", async (event) => {
+document.getElementById("form-evento")?.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!currentEventId) return;
   const firebase = getFirebase();
@@ -607,12 +684,12 @@ document.getElementById("form-evento").addEventListener("submit", async (event) 
   }
 });
 
-document.getElementById("btn-back-events").addEventListener("click", async () => {
+document.getElementById("btn-back-events")?.addEventListener("click", async () => {
   showList();
   await loadEventList();
 });
 
-document.getElementById("btn-sortear").addEventListener("click", async () => {
+document.getElementById("btn-sortear")?.addEventListener("click", async () => {
   const firebase = getFirebase();
   const snap = await getDocs(query(collection(firebase.db, "projects"), where("eventId", "==", currentEventId)));
   if (snap.docs.length < 2) {
@@ -627,14 +704,14 @@ document.getElementById("btn-sortear").addEventListener("click", async () => {
   await loadAdminData();
 });
 
-document.getElementById("btn-votacao").addEventListener("click", async () => {
+document.getElementById("btn-votacao")?.addEventListener("click", async () => {
   const event = await loadEvent(currentEventId);
   await updateDoc(doc(getFirebase().db, "events", currentEventId), { votingOpen: !event.votingOpen });
   showToast(event.votingOpen ? "Votação fechada." : "Votação aberta.");
   await loadAdminData();
 });
 
-document.getElementById("btn-podio").addEventListener("click", async () => {
+document.getElementById("btn-podio")?.addEventListener("click", async () => {
   if (!currentEventId) return;
   const firebase = requireFirebase();
   if (!firebase) return;
@@ -659,13 +736,13 @@ document.getElementById("btn-podio").addEventListener("click", async () => {
   }
 });
 
-document.getElementById("edit-add-student").addEventListener("click", () => {
+document.getElementById("edit-add-student")?.addEventListener("click", () => {
   editStudentsList.appendChild(editStudentRow("", true));
   refreshEditRemoveButtons();
 });
-document.getElementById("edit-cancel").addEventListener("click", () => closeEdit());
+document.getElementById("edit-cancel")?.addEventListener("click", () => closeEdit());
 
-document.getElementById("btn-copy-qr").addEventListener("click", async () => {
+document.getElementById("btn-copy-qr")?.addEventListener("click", async () => {
   const url = document.getElementById("admin-qr-url").textContent;
   if (!url) return;
   try {
@@ -676,7 +753,7 @@ document.getElementById("btn-copy-qr").addEventListener("click", async () => {
   }
 });
 
-document.getElementById("form-edit-projeto").addEventListener("submit", async (event) => {
+document.getElementById("form-edit-projeto")?.addEventListener("submit", async (event) => {
   event.preventDefault();
   const id = document.getElementById("edit-project-id").value;
   const title = document.getElementById("edit-title").value.trim();
@@ -809,27 +886,3 @@ document.querySelectorAll("[data-admin-tab]").forEach((btn) => {
     setAdminTab(btn.dataset.adminTab);
   });
 });
-
-const firebase = requireFirebase();
-if (firebase) {
-  onAuthStateChanged(firebase.auth, async (user) => {
-    if (user) {
-      loginSection.classList.add("hidden");
-      panelSection.classList.remove("hidden");
-      try {
-        const params = new URLSearchParams(window.location.search);
-        const requested = params.get("evento");
-        const requestedKind = params.get("tipo");
-        if (requestedKind) setAdminTab(requestedKind, { updateUrl: false });
-        await Promise.all([loadEventList(), loadHomeBannerForm()]);
-        if (requested) await openEvent(requested);
-      } catch (error) {
-        console.error(error);
-        showToast("Não foi possível carregar o painel. Confira as regras do Firestore.", "error");
-      }
-    } else {
-      loginSection.classList.remove("hidden");
-      panelSection.classList.add("hidden");
-    }
-  });
-}
