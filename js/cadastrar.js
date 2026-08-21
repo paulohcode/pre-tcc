@@ -11,6 +11,7 @@ import {
   eventType,
 } from "./app.js";
 import { bindPhotoField, imageFromField } from "./imgbb.js";
+import { bindPdfField, pdfFromField } from "./pdf.js";
 
 const params = new URLSearchParams(window.location.search);
 const eventId = params.get("evento");
@@ -90,6 +91,7 @@ async function setup() {
 list.appendChild(studentRow(false));
 addBtn.addEventListener("click", () => list.appendChild(studentRow(true)));
 bindPhotoField("project-image");
+bindPdfField("project-pdf", { linkInputId: "project-pdf-link" });
 setup().catch((error) => {
   console.error(error);
   form.classList.add("hidden");
@@ -127,6 +129,7 @@ form.addEventListener("submit", async (event) => {
   submitBtn.disabled = true;
   try {
     const images = await imageFromField("project-image");
+    const pdf = await pdfFromField("project-pdf", undefined, "project-pdf-link");
     await addDoc(collection(firebase.db, "projects"), {
       eventId,
       title,
@@ -135,12 +138,13 @@ form.addEventListener("submit", async (event) => {
       order: null,
       createdAt: serverTimestamp(),
       ...images,
+      ...pdf,
     });
     showToast("Inscrição publicada.");
     window.location.href = `evento.html?id=${encodeURIComponent(eventId)}`;
   } catch (error) {
     console.error(error);
-    showToast("Não foi possível cadastrar. Confira as regras do Firestore.", "error");
+    showToast(error.message || "Não foi possível cadastrar. Confira as regras do Firestore.", "error");
     submitBtn.disabled = false;
   }
 });

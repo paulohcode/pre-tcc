@@ -133,6 +133,7 @@ export function normalizeEvent(id, data = {}) {
     imageCardUrl: data.imageCardUrl || data.imageUrl || "",
     votingOpen: Boolean(data.votingOpen),
     orderDrawnAt: data.orderDrawnAt || null,
+    podium: Array.isArray(data.podium) ? data.podium : [],
     createdAt: data.createdAt || null,
   };
 }
@@ -203,6 +204,7 @@ export function projectCardHtml(project, event) {
       <h3 class="text-xl font-semibold mb-2">${escapeHtml(project.title)}</h3>
       <p class="text-sm text-slate-500 mb-3">${escapeHtml((project.students || []).join(" · "))}</p>
       <p class="text-slate-600 text-sm line-clamp-3">${escapeHtml(project.description)}</p>
+      ${project.pdfUrl ? `<p class="text-xs font-semibold uppercase tracking-wide text-blue mt-3">PDF anexado</p>` : ""}
       <p class="text-blue text-sm font-medium mt-4">${escapeHtml(type.vote)} →</p>
       </div>
     </a>
@@ -276,6 +278,41 @@ export function average(values) {
 
 export function round1(n) {
   return Math.round(n * 10) / 10;
+}
+
+export function rankingRows(projects, votes, event) {
+  const byProject = new Map(projects.map((project) => [project.id, []]));
+  votes.forEach((vote) => {
+    if (!byProject.has(vote.projectId)) byProject.set(vote.projectId, []);
+    byProject.get(vote.projectId).push(vote);
+  });
+  const criteria = voteCriteria(event);
+  return projects
+    .map((project) => {
+      const list = byProject.get(project.id) || [];
+      const avg = list.length ? average(list.map((vote) => Number(vote.average) || 0)) : 0;
+      const criteriaAvgs = criteria.map((item) => {
+        const values = list.map((vote) => Number(vote.criteria?.[item.id]) || 0);
+        return { id: item.id, label: item.label, avg: list.length ? average(values) : 0 };
+      });
+      return { project, count: list.length, avg, criteriaAvgs };
+    })
+    .sort((a, b) => b.avg - a.avg || b.count - a.count);
+}
+
+export function podiumFromRanking(rows, limit = 3) {
+  return rows
+    .filter((row) => row.count > 0)
+    .slice(0, limit)
+    .map((row, index) => ({
+      place: index + 1,
+      id: row.project.id,
+      title: row.project.title || "",
+      students: row.project.students || [],
+      imageUrl: row.project.imageCardUrl || row.project.imageUrl || "",
+      avg: round1(row.avg),
+      count: row.count,
+    }));
 }
 
 export function normalizeSiteConfig(data = {}) {

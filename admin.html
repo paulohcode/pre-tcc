@@ -282,7 +282,10 @@
           <div class="panel p-6 md:p-8">
             <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
               <h2 class="text-2xl font-semibold">Ranking</h2>
-              <p class="text-xs uppercase tracking-wide text-slate-400">Visível apenas na área interna</p>
+              <div class="flex flex-wrap items-center gap-3">
+                <button type="button" id="btn-podio" class="btn-primary px-5 py-3 hidden">Gerar pódio</button>
+                <p class="text-xs uppercase tracking-wide text-slate-400">Visível apenas na área interna</p>
+              </div>
             </div>
             <div id="ranking-empty" class="text-slate-500 text-sm">Ainda não há votos.</div>
             <div id="ranking-table" class="hidden overflow-x-auto">
@@ -330,6 +333,15 @@
                 <p class="text-xs text-slate-500 mt-2">Padrão 16:9 (1920×1080). O card usa uma versão menor gerada automaticamente.</p>
                 <img id="edit-project-image-preview" alt="Prévia da foto" class="photo-preview hidden mt-3" />
                 <button type="button" id="edit-project-image-remove" class="hidden mt-2 text-sm text-red-600 hover:underline">Excluir imagem</button>
+              </div>
+              <div>
+                <label for="edit-project-pdf" class="block text-sm mb-2">PDF do trabalho</label>
+                <input id="edit-project-pdf" type="file" accept="application/pdf,.pdf" class="field" />
+                <p id="edit-project-pdf-name" class="hidden text-sm text-slate-600 mt-2"></p>
+                <button type="button" id="edit-project-pdf-remove" class="hidden mt-2 text-sm text-red-600 hover:underline">Excluir PDF</button>
+                <label for="edit-project-pdf-link" class="block text-sm mt-4 mb-2">Ou cole um link público</label>
+                <input id="edit-project-pdf-link" type="url" class="field" placeholder="https://drive.google.com/..." />
+                <p class="text-xs text-slate-500 mt-2">Até 10 MB. Arquivo via Cloudinary gratuito, ou link do Google Drive.</p>
               </div>
               <div class="flex flex-wrap items-center gap-4">
                 <button type="submit" id="edit-save" class="btn-primary px-5 py-3 disabled:opacity-50">Salvar alterações</button>

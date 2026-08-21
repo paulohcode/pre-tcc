@@ -26,11 +26,11 @@ import {
   loadEvents,
   loadEvent,
   eventType,
-  voteCriteria,
   lockedVoteAccess,
   isContest,
-  average,
   round1,
+  rankingRows,
+  podiumFromRanking,
   allowsQrVote,
   eventPublicUrl,
   renderQrCode,
@@ -40,6 +40,7 @@ import {
   homeBannerAssets,
 } from "./app.js";
 import { bindPhotoField, setPhotoPreview, imageFromField, emptyImages, uploadHomeBanner } from "./imgbb.js";
+import { bindPdfField, setPdfPreview, pdfFromField, emptyPdf } from "./pdf.js";
 
 const loginSection = document.getElementById("admin-login");
 const panelSection = document.getElementById("admin-panel");
@@ -56,6 +57,7 @@ let projectsById = new Map();
 let currentEventId = null;
 let currentEventImages = emptyImages();
 let currentProjectImages = emptyImages();
+let currentProjectPdf = emptyPdf();
 let currentSiteImages = emptyImages();
 let currentKind = "projetos";
 
@@ -364,7 +366,11 @@ function closeEdit() {
   document.getElementById("form-edit-projeto").reset();
   editStudentsList.innerHTML = "";
   currentProjectImages = emptyImages();
+  currentProjectPdf = emptyPdf();
   setPhotoPreview("edit-project-image", "");
+  setPdfPreview("edit-project-pdf");
+  const pdfLink = document.getElementById("edit-project-pdf-link");
+  if (pdfLink) pdfLink.value = "";
 }
 
 function openEdit(project) {
@@ -380,6 +386,13 @@ function openEdit(project) {
     imageCardUrl: project.imageCardUrl || project.imageUrl || "",
   };
   setPhotoPreview("edit-project-image", currentProjectImages.imageUrl);
+  currentProjectPdf = {
+    pdfUrl: project.pdfUrl || "",
+    pdfName: project.pdfName || "",
+  };
+  setPdfPreview("edit-project-pdf", currentProjectPdf);
+  const pdfLink = document.getElementById("edit-project-pdf-link");
+  if (pdfLink) pdfLink.value = currentProjectPdf.pdfUrl || "";
   const students = (project.students || []).map((name) => String(name).trim()).filter(Boolean);
   editStudentsList.innerHTML = "";
   (students.length ? students : [""]).forEach((name, index, list) => {
@@ -452,24 +465,10 @@ function renderProjects(projects, event) {
 }
 
 function renderRanking(projects, votes, event) {
-  const byProject = new Map(projects.map((p) => [p.id, []]));
-  votes.forEach((vote) => {
-    if (!byProject.has(vote.projectId)) byProject.set(vote.projectId, []);
-    byProject.get(vote.projectId).push(vote);
-  });
-  const criteria = voteCriteria(event);
-
-  const rows = projects
-    .map((project) => {
-      const list = byProject.get(project.id) || [];
-      const avg = list.length ? average(list.map((v) => Number(v.average) || 0)) : 0;
-      const criteriaAvgs = criteria.map((c) => {
-        const values = list.map((v) => Number(v.criteria?.[c.id]) || 0);
-        return { id: c.id, label: c.label, avg: list.length ? average(values) : 0 };
-      });
-      return { project, count: list.length, avg, criteriaAvgs };
-    })
-    .sort((a, b) => b.avg - a.avg || b.count - a.count);
+  const rows = rankingRows(projects, votes, event);
+  const podiumBtn = document.getElementById("btn-podio");
+  const hasScores = rows.some((row) => row.count > 0);
+  podiumBtn.classList.toggle("hidden", !hasScores);
 
   if (!votes.length) {
     rankingEmpty.classList.remove("hidden");
@@ -635,6 +634,31 @@ document.getElementById("btn-votacao").addEventListener("click", async () => {
   await loadAdminData();
 });
 
+document.getElementById("btn-podio").addEventListener("click", async () => {
+  if (!currentEventId) return;
+  const firebase = requireFirebase();
+  if (!firebase) return;
+  try {
+    const event = await loadEvent(currentEventId);
+    const [projectsSnap, votesSnap] = await Promise.all([
+      getDocs(query(collection(firebase.db, "projects"), where("eventId", "==", currentEventId))),
+      getDocs(query(collection(firebase.db, "votes"), where("eventId", "==", currentEventId))),
+    ]);
+    const projects = projectsSnap.docs.map((item) => ({ id: item.id, ...item.data() }));
+    const votes = votesSnap.docs.map((item) => ({ id: item.id, ...item.data() }));
+    const podium = podiumFromRanking(rankingRows(projects, votes, event));
+    if (!podium.length) {
+      showToast("Ainda não há pontuação para montar o pódio.", "error");
+      return;
+    }
+    await updateDoc(doc(firebase.db, "events", currentEventId), { podium });
+    window.open(`podio.html?evento=${encodeURIComponent(currentEventId)}`, "_blank", "noopener");
+  } catch (error) {
+    console.error(error);
+    showToast("Não foi possível gerar o pódio.", "error");
+  }
+});
+
 document.getElementById("edit-add-student").addEventListener("click", () => {
   editStudentsList.appendChild(editStudentRow("", true));
   refreshEditRemoveButtons();
@@ -667,11 +691,13 @@ document.getElementById("form-edit-projeto").addEventListener("submit", async (e
   editSaveBtn.disabled = true;
   try {
     const images = await imageFromField("edit-project-image", currentProjectImages);
+    const pdf = await pdfFromField("edit-project-pdf", currentProjectPdf, "edit-project-pdf-link");
     await updateDoc(doc(getFirebase().db, "projects", id), {
       title,
       description,
       students,
       ...images,
+      ...pdf,
     });
     showToast("Inscrição atualizada.");
     closeEdit();
@@ -751,7 +777,31 @@ bindPhotoField("edit-project-image", {
   },
 });
 
-document.querySelectorAll("[data-admin-tab]").forEach((btn) => {
+bindPdfField("edit-project-pdf", {
+  linkInputId: "edit-project-pdf-link",
+  confirmRemove: () => {
+    const id = document.getElementById("edit-project-id").value;
+    if (id && currentProjectPdf.pdfUrl) return confirm("Excluir o PDF desta inscrição?");
+    return true;
+  },
+  afterRemove: async () => {
+    const id = document.getElementById("edit-project-id").value;
+    if (!id || !currentProjectPdf.pdfUrl) return;
+    try {
+      await updateDoc(doc(getFirebase().db, "projects", id), { pdfUrl: "", pdfName: "" });
+      currentProjectPdf = emptyPdf();
+      const project = projectsById.get(id);
+      if (project) {
+        project.pdfUrl = "";
+        project.pdfName = "";
+      }
+      showToast("PDF excluído.");
+    } catch (error) {
+      console.error(error);
+      showToast("Não foi possível excluir o PDF.", "error");
+    }
+  },
+});
   btn.addEventListener("click", () => {
     if (currentEventId) return;
     setAdminTab(btn.dataset.adminTab);

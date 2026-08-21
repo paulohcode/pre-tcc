@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Pódio — SESI SENAI Umuarama</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/podio.css" />
+  </head>
+  <body>
+    <canvas id="champagne" aria-hidden="true"></canvas>
+    <a class="podium-back" href="admin.html">← Área interna</a>
+    <main class="podium-stage">
+      <p id="podium-kicker" class="podium-kicker">SESI SENAI Umuarama</p>
+      <h1 id="podium-title" class="podium-title">Pódio</h1>
+      <p id="podium-empty" class="podium-empty hidden">Gere o pódio pelo ranking na área interna.</p>
+      <div id="podium-places" class="podium-places hidden">
+        <article class="podium-card" data-slot="2">
+          <div class="podium-photo-wrap">
+            <img class="podium-photo" alt="" />
+          </div>
+          <p class="podium-place">2º</p>
+          <h2 class="podium-name"></h2>
+          <p class="podium-team"></p>
+          <p class="podium-score"></p>
+          <div class="podium-step podium-step-2">2</div>
+        </article>
+        <article class="podium-card is-first" data-slot="1">
+          <div class="champagne-bottle champagne-bottle-left" aria-hidden="true"></div>
+          <div class="champagne-bottle champagne-bottle-right" aria-hidden="true"></div>
+          <div class="podium-photo-wrap">
+            <img class="podium-photo" alt="" />
+          </div>
+          <p class="podium-place">1º</p>
+          <h2 class="podium-name"></h2>
+          <p class="podium-team"></p>
+          <p class="podium-score"></p>
+          <div class="podium-step podium-step-1">1</div>
+        </article>
+        <article class="podium-card" data-slot="3">
+          <div class="podium-photo-wrap">
+            <img class="podium-photo" alt="" />
+          </div>
+          <p class="podium-place">3º</p>
+          <h2 class="podium-name"></h2>
+          <p class="podium-team"></p>
+          <p class="podium-score"></p>
+          <div class="podium-step podium-step-3">3</div>
+        </article>
+      </div>
+    </main>
+    <script type="module" src="js/podio.js"></script>
+  </body>
+</html>

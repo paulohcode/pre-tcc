@@ -179,6 +179,16 @@ async function loadPage() {
   document.getElementById("projeto-title").textContent = currentProject.title;
   document.getElementById("projeto-students").textContent = (currentProject.students || []).join(" · ");
   document.getElementById("projeto-description").textContent = currentProject.description;
+  const pdfWrap = document.getElementById("projeto-pdf-wrap");
+  const pdfLink = document.getElementById("projeto-pdf");
+  if (currentProject.pdfUrl) {
+    pdfLink.href = currentProject.pdfUrl;
+    pdfLink.textContent = currentProject.pdfName ? `Abrir PDF (${currentProject.pdfName})` : "Abrir PDF do trabalho";
+    pdfWrap.classList.remove("hidden");
+  } else {
+    pdfLink.removeAttribute("href");
+    pdfWrap.classList.add("hidden");
+  }
   const cover = document.getElementById("projeto-cover");
   const coverWrap = document.getElementById("projeto-cover-wrap");
   const full = eventCoverSrc(currentProject, "full");

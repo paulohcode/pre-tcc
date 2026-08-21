@@ -78,6 +78,15 @@
           <img id="project-image-preview" alt="Prévia da foto" class="photo-preview hidden mt-3" />
           <button type="button" id="project-image-remove" class="hidden mt-2 text-sm text-red-600 hover:underline">Excluir imagem</button>
         </div>
+        <div>
+          <label for="project-pdf" class="block text-sm mb-2">PDF do trabalho (opcional)</label>
+          <input id="project-pdf" type="file" accept="application/pdf,.pdf" class="field" />
+          <p id="project-pdf-name" class="hidden text-sm text-slate-600 mt-2"></p>
+          <button type="button" id="project-pdf-remove" class="hidden mt-2 text-sm text-red-600 hover:underline">Excluir PDF</button>
+          <label for="project-pdf-link" class="block text-sm mt-4 mb-2">Ou cole um link público</label>
+          <input id="project-pdf-link" type="url" class="field" placeholder="https://drive.google.com/..." />
+          <p class="text-xs text-slate-500 mt-2">Até 10 MB. Sem plano pago: envie o arquivo (Cloudinary gratuito) ou cole um link do Google Drive com “qualquer pessoa com o link”.</p>
+        </div>
         <button type="submit" id="submit-projeto" class="btn-primary w-full py-3 disabled:opacity-50">Publicar</button>
       </form>
     </main>
