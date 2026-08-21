@@ -802,6 +802,8 @@ bindPdfField("edit-project-pdf", {
     }
   },
 });
+
+document.querySelectorAll("[data-admin-tab]").forEach((btn) => {
   btn.addEventListener("click", () => {
     if (currentEventId) return;
     setAdminTab(btn.dataset.adminTab);
