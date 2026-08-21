@@ -34,6 +34,14 @@ function rain() {
 }
 
 function sprayFromBottles() {
+  const bottles = document.querySelectorAll(".is-first .champagne-bottle");
+  if (bottles.length) {
+    bottles.forEach((bottle) => {
+      const box = bottle.getBoundingClientRect();
+      spawn(box.left + box.width / 2, box.top, Math.random() > 0.62);
+    });
+    return;
+  }
   const first = document.querySelector(".is-first");
   if (!first) return;
   const box = first.getBoundingClientRect();

@@ -7,48 +7,57 @@
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/podio.css" />
   </head>
   <body>
+    <div class="podium-glow" aria-hidden="true"></div>
     <canvas id="champagne" aria-hidden="true"></canvas>
     <a class="podium-back" href="admin.html">← Área interna</a>
     <main class="podium-stage">
-      <p id="podium-kicker" class="podium-kicker">SESI SENAI Umuarama</p>
-      <h1 id="podium-title" class="podium-title">Pódio</h1>
+      <header class="podium-head">
+        <p id="podium-kicker" class="podium-kicker">SESI SENAI Umuarama</p>
+        <div class="podium-rule" aria-hidden="true"></div>
+        <h1 id="podium-title" class="podium-title">Pódio</h1>
+        <p class="podium-subtitle">Celebração dos três primeiros</p>
+      </header>
       <p id="podium-empty" class="podium-empty hidden">Gere o pódio pelo ranking na área interna.</p>
       <div id="podium-places" class="podium-places hidden">
         <article class="podium-card" data-slot="2">
           <div class="podium-photo-wrap">
+            <span class="podium-fallback" aria-hidden="true">2</span>
             <img class="podium-photo" alt="" />
           </div>
-          <p class="podium-place">2º</p>
+          <p class="podium-place">Segundo lugar</p>
           <h2 class="podium-name"></h2>
           <p class="podium-team"></p>
           <p class="podium-score"></p>
-          <div class="podium-step podium-step-2">2</div>
+          <div class="podium-step podium-step-2"><span>II</span></div>
         </article>
         <article class="podium-card is-first" data-slot="1">
           <div class="champagne-bottle champagne-bottle-left" aria-hidden="true"></div>
           <div class="champagne-bottle champagne-bottle-right" aria-hidden="true"></div>
+          <div class="podium-crown" aria-hidden="true">♛</div>
           <div class="podium-photo-wrap">
+            <span class="podium-fallback" aria-hidden="true">1</span>
             <img class="podium-photo" alt="" />
           </div>
-          <p class="podium-place">1º</p>
+          <p class="podium-place">Campeão</p>
           <h2 class="podium-name"></h2>
           <p class="podium-team"></p>
           <p class="podium-score"></p>
-          <div class="podium-step podium-step-1">1</div>
+          <div class="podium-step podium-step-1"><span>I</span></div>
         </article>
         <article class="podium-card" data-slot="3">
           <div class="podium-photo-wrap">
+            <span class="podium-fallback" aria-hidden="true">3</span>
             <img class="podium-photo" alt="" />
           </div>
-          <p class="podium-place">3º</p>
+          <p class="podium-place">Terceiro lugar</p>
           <h2 class="podium-name"></h2>
           <p class="podium-team"></p>
           <p class="podium-score"></p>
-          <div class="podium-step podium-step-3">3</div>
+          <div class="podium-step podium-step-3"><span>III</span></div>
         </article>
       </div>
     </main>
